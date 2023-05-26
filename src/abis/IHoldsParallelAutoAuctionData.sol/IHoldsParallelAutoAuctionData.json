@@ -1,0 +1,102 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IHoldsParallelAutoAuctionData",
+  "sourceName": "contracts/interfaces/IHoldsParallelAutoAuctionData.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "auctionConfig",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "auctionedNft",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "lines",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint32",
+              "name": "baseDuration",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "timeBuffer",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint96",
+              "name": "startingPrice",
+              "type": "uint96"
+            },
+            {
+              "internalType": "uint96",
+              "name": "bidIncrement",
+              "type": "uint96"
+            }
+          ],
+          "internalType": "struct AuctionConfig",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "name": "lineState",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint24",
+              "name": "head",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint40",
+              "name": "startTime",
+              "type": "uint40"
+            },
+            {
+              "internalType": "uint40",
+              "name": "endTime",
+              "type": "uint40"
+            },
+            {
+              "internalType": "address",
+              "name": "currentWinner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint96",
+              "name": "currentPrice",
+              "type": "uint96"
+            }
+          ],
+          "internalType": "struct LineState",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
