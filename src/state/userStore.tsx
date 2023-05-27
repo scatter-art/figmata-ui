@@ -5,9 +5,10 @@ import { create } from 'zustand'
 
 import * as O from 'fp-ts/Option'
 import * as TO from 'fp-ts/TaskOption'
-import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
+import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/lib/function'
-import { TO2 } from '../utils/pure'
+import { TE2, TO2 } from '../utils/pure'
 
 /**
  * @notice The system should work even if `O.isNone(defaultProvider)`
@@ -30,14 +31,31 @@ export type UserStoreState = {
      *  returns `O.none`
      */
     getBestProvider: () => O.Option<Provider | BrowserProvider>
+    
+    /**
+     * @dev If this function is called, the state will get killed,
+     * so the dev will need to call `connectUser`.
+     */
+    disconnectUser: () => void
+
+    /**
+     * @dev Tries to connect the user.
+     * @returns Failure or succes.
+     */
+    connectUser: () => Promise<E.Either<any, any>>
+    
+    userConnected: () => boolean
 }
 
 export const useUserStore = create<UserStoreState>(set => ({
-    userProvider: _getUserProvider(),
+    userProvider: O.none,
     userAddress: O.none,
     defaultProvider: O.none,
     updateProviders,
     getBestProvider,
+    disconnectUser,
+    connectUser,
+    userConnected
 }))
 
 const getBestProvider = (): O.Option<Provider | BrowserProvider> => {
@@ -71,3 +89,35 @@ const _getUserAddress = (): Promise<O.Option<string>> => {
     )()
 }
 
+const userConnected = (): boolean => {
+    return pipe(
+        useUserStore(state => state.userAddress),
+        O.match(
+            (    ) => false,
+            (addr) => true
+        )
+    )
+}
+
+const disconnectUser = () => {
+    if (window.ethereum) 
+        window.ethereum.removeAllListeners();
+
+    useUserStore.setState({ userProvider: O.none })
+    useUserStore.setState({ userAddress: O.none })
+}
+
+const connectUser = async () => {
+    const provider = TE.fromOption(() => {})(_getUserProvider())
+    return await pipe(
+        provider,
+        TE2.flatTryE(prov => prov.send('eth_requestAccounts', [])),
+        TE.match(
+            (err) => {
+                disconnectUser()
+                return E.left(err)
+            },
+            (res) => E.right(res)
+        ),
+    )()
+};

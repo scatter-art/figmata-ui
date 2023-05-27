@@ -1,7 +1,8 @@
 import * as O from "fp-ts/lib/Option";
 import * as E from "fp-ts/lib/Either";
 import * as TO from 'fp-ts/TaskOption'
-import { pipe } from "fp-ts/lib/function";
+import * as TE from 'fp-ts/TaskEither'
+import { identity, pipe } from "fp-ts/lib/function";
 
 /**
  * @dev This function will unwrap a `TO.TaskOption` and try to run
@@ -13,6 +14,12 @@ export function flatTry <X,Z>(f: (b: X) => Promise<Z>):
     (x: TO.TaskOption<X>) => TO.TaskOption<Z> 
 {
     return TO.chain(x => TO.tryCatch(() => f(x)))
+}
+
+export function flatTryE <X,Z,E>(f: (b: X) => Promise<Z>): 
+    (x: TE.TaskEither<E,X>) => TE.TaskEither<unknown,Z> 
+{
+    return TE.chain(x => TE.tryCatch(() => f(x), identity))
 }
 
 /**
@@ -56,6 +63,10 @@ export type UnOptionMap<T> = {
 
 export const TO2 = {
     flatTry
+};
+
+export const TE2 = {
+    flatTryE
 };
 
 export const UnsafeFun = {
