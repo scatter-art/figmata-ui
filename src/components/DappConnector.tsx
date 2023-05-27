@@ -1,20 +1,22 @@
 import { useUserStore } from "../state/userStore"
 
-const useWalletText = () => {
-    const connected = useUserStore(s => s.userConnected)()
-    if (connected) return 'Disconnect'
-    else return 'Connect'
-}
-
-const useHandler = () => {
-    const state = useUserStore
-    if(state(s => s.userConnected)())
-        state(s => s.disconnectUser)()
-    else state(s => s.connectUser)()
-}
-
 export const DappConnector = () => {
-    return <button onClick={useHandler}>
-        {useWalletText()}
+    
+    const userConnected = useUserStore(state => state.userConnected)
+    const connection = useUserStore(state => state.connectUser)
+    const disconnection = useUserStore(state => state.disconnectUser)
+
+    const handleClick = async () => {
+        if (!userConnected) connection()
+        else disconnection()
+    }
+
+    const getWalletText = () => {
+        if (userConnected) return 'Disconnect'
+        else return 'Connect'
+    }
+
+    return <button onClick={handleClick}>
+        {getWalletText()}
     </button>
 }

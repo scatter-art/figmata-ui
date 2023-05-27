@@ -18,8 +18,10 @@ export type UserStoreState = {
     userProvider: O.Option<BrowserProvider>,
     userAddress: O.Option<string>,
     defaultProvider: O.Option<Provider>,
+    userConnected: boolean,
+
     /**
-     * @dev This function will try to reinitialize `window.ethereum`s
+     * @dev This function will try to reinitialize `window.ethereum`
      * BrowserProvider and the `defaultProvider`. It should generally
      * be avoided unless dealing with some weird state loading logics.
      */
@@ -30,94 +32,81 @@ export type UserStoreState = {
      *  returns `defaultProvider` if exists, if not,
      *  returns `O.none`
      */
-    getBestProvider: () => O.Option<Provider | BrowserProvider>
+    getBestProvider: () => O.Option<Provider | BrowserProvider>,
     
     /**
      * @dev If this function is called, the state will get killed,
      * so the dev will need to call `connectUser`.
      */
-    disconnectUser: () => void
+    disconnectUser: () => void,
 
     /**
      * @dev Tries to connect the user.
      * @returns Failure or succes.
      */
-    connectUser: () => Promise<E.Either<any, any>>
-    
-    userConnected: () => boolean
+    connectUser: () => Promise<E.Either<any, any>>,
+
+    _getUserProvider: () =>  O.Option<BrowserProvider>,
+
+    _getUserAddress: () => Promise<O.Option<string>>
 }
 
-export const useUserStore = create<UserStoreState>(set => ({
+
+export const useUserStore = create<UserStoreState>((set, get) => ({
     userProvider: O.none,
     userAddress: O.none,
     defaultProvider: O.none,
-    updateProviders,
-    getBestProvider,
-    disconnectUser,
-    connectUser,
-    userConnected
-}))
+    userConnected: false,
 
-const getBestProvider = (): O.Option<Provider | BrowserProvider> => {
-    const userProvider = useUserStore(state => state.userProvider)
-    const defaultProvider = useUserStore(state => state.defaultProvider)
-    
-    return pipe(
-        userProvider,
-        O.orElse(() => defaultProvider)
-    )
-}
+    updateProviders: () => {
+        set({ userProvider: get()._getUserProvider() })
+        // TODO
+        set({ defaultProvider: O.none })
+    },
 
-const updateProviders = () => {
-    useUserStore.setState({ userProvider: _getUserProvider() })
-    // TODO
-    useUserStore.setState({ defaultProvider: O.none })
-}
+    getBestProvider: () => pipe(
+        get().userProvider,
+        O.orElse(() => get().defaultProvider)
+    ),
 
-const _getUserProvider = (): O.Option<BrowserProvider> => {
-    const provider = O.tryCatch(() => new BrowserProvider(window.ethereum))
-    _getUserAddress().then(addr => useUserStore.setState({ userAddress: addr }))
-    return provider
-}
+    disconnectUser: () => {
+        console.log('Wallet disconnected')
+        if (window.ethereum) window.ethereum.removeAllListeners();
+        set({ userProvider: O.none, userAddress: O.none, userConnected: false })
+    },
 
-const _getUserAddress = (): Promise<O.Option<string>> => {
-    const userOpt = TO.fromOption(useUserStore(state => state.userProvider))
-    return pipe(
-        userOpt,
+    connectUser: async () => {
+        const connection = await pipe(
+            get().updateProviders(),
+            () => get().userProvider,
+            TE.fromOption(() => 'Non existent user provider'),
+            TE2.flatTryE(prov => prov.send('eth_requestAccounts', [])),
+        )()
+
+        if (E.isLeft(connection)) {
+            E.mapLeft(console.log)(connection)
+            get().disconnectUser()
+        } else {
+            console.log('Wallet connected')
+            get()._getUserProvider()
+            set({ userConnected: true }) 
+        }
+        return connection
+    },
+
+    _getUserProvider: () => {
+        const provider = O.tryCatch(() => new BrowserProvider(window.ethereum))
+        set({ userProvider: provider })
+        get()._getUserAddress().then(addr => {
+            set({ userAddress: addr })
+        })
+        return provider
+    },
+
+    _getUserAddress: () => pipe(
+        TO.fromOption(get().userProvider),
         TO2.flatTry(provider => provider.getSigner()),
         TO.map(signer => signer.address)
     )()
-}
 
-const userConnected = (): boolean => {
-    return pipe(
-        useUserStore(state => state.userAddress),
-        O.match(
-            (    ) => false,
-            (addr) => true
-        )
-    )
-}
-
-const disconnectUser = () => {
-    if (window.ethereum) 
-        window.ethereum.removeAllListeners();
-
-    useUserStore.setState({ userProvider: O.none })
-    useUserStore.setState({ userAddress: O.none })
-}
-
-const connectUser = async () => {
-    const provider = TE.fromOption(() => {})(_getUserProvider())
-    return await pipe(
-        provider,
-        TE2.flatTryE(prov => prov.send('eth_requestAccounts', [])),
-        TE.match(
-            (err) => {
-                disconnectUser()
-                return E.left(err)
-            },
-            (res) => E.right(res)
-        ),
-    )()
-};
+}))
