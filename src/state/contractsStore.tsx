@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
-import create from 'zustand'
+import { create } from 'zustand'
+
 import * as O from 'fp-ts/Option'
 import * as S from 'fp-ts/string'
 import * as TO from 'fp-ts/TaskOption'
@@ -12,6 +13,7 @@ import { IERC721 } from '../types/IERC721'
 import { IERC721__factory } from '../types/factories/IERC721__factory'
 
 import { useUserStore } from './userStore'
+import { TO2 } from '../utils/pure'
 
 
 /**
@@ -44,7 +46,7 @@ const getAuctionableIds = async (): Promise<O.Option<bigint[]>> => {
     return pipe(
         contractOpt,
         TO.fromOption,
-        TO.chain(contract => TO.tryCatch(() => contract.getIdsToAuction())),
+        TO2.flatTry(contract => contract.getIdsToAuction())
     )()
 }
 
@@ -105,7 +107,7 @@ const _getAuctionedTokenAddress = async (): Promise<O.Option<string>> => {
     return pipe(
         contractOpt,
         TO.fromOption,
-        TO.chain(contract => TO.tryCatch(() => contract.getAuctionedToken()))
+        TO2.flatTry(contract => contract.getAuctionedToken())
     )()
 }
 
@@ -114,7 +116,7 @@ const getTokenIdPrice = (id: number): Promise<O.Option<bigint>> => {
     return pipe(
         contractOpt,
         TO.fromOption,
-        TO.chain(contract => TO.tryCatch(() => contract.getMinPriceFor(id)))
+        TO2.flatTry(contract => contract.getMinPriceFor(id))
     )()
 }
 
