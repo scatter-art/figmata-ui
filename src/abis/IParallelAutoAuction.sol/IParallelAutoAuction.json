@@ -109,9 +109,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint8",
-          "name": "",
-          "type": "uint8"
+          "internalType": "uint24",
+          "name": "tokenId",
+          "type": "uint24"
         }
       ],
       "name": "lineState",

@@ -1,15 +1,13 @@
 import './App.css';
-import { DappConnector } from './components/DappConnector';
-import { UserAddress } from './components/UserAddress';
+import { FigmataPage } from './components/FigmataPage';
 
 function App() {
-  return (
-    <div className="App">
-        <DappConnector />
-        <br/>
-        <UserAddress />
-    </div>
-  );
+    
+    return (
+        <div className="App">
+            <FigmataPage />
+        </div>
+    );
 }
 
 export default App;

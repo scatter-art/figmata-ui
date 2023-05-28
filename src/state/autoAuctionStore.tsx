@@ -45,11 +45,11 @@ type ParallelAuctionStoreState = {
     // TODO do some checks on `tokenImagesUri`.
     setAuctionData: (
         auctionAddress: string[42], 
-        auctionedtokenname: string, 
+        auctionedTokenName: string, 
         tokenImagesUri: string
     ) => void,
 
-    getIdsToAuction: () => Promise<O.Option<bigint[]>>,
+    getIdsToAuction: () => Promise<O.Option<number[]>>,
     
     /**
      * @returns An maybe `LineStateStruct`. This type should hold
@@ -60,7 +60,9 @@ type ParallelAuctionStoreState = {
     /**
      * @returns The minimum price the user should pay for a bid of `tokenId`.
      */
-    getMinPrice: (tokenId: number) => Promise<O.Option<bigint>>
+    getMinPrice: (tokenId: number) => Promise<O.Option<bigint>>,
+
+    getImage: (tokenId: number) => string
 
 }
 
@@ -73,7 +75,8 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         tokenImagesUri: string
     ) => {
         
-        const getBestProvider = useUserStore(state => state.getBestProvider)
+        //const getBestProvider = useUserStore(state => state.getBestProvider)
+        const getBestProvider = useUserStore.getState().getBestProvider
 
         // If the new `addr` is the same as `currentAddress` just return
         // to evite redundant computations.
@@ -90,7 +93,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             bestProvider,
             O.map(prov => IParallelAutoAuction__factory.connect(auctionAddress, prov))
         )
-        
+
         const auctionedTokenAddr = await pipe(
             TO.fromOption(auctionContract),
             TO2.flatTry(auction => auction.getAuctionedToken())
@@ -124,7 +127,8 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         get().auctionData,
         O.map(data => data.auctionContract),
         TO.fromOption,
-        TO2.flatTry(x => x.getIdsToAuction())
+        TO2.flatTry(x => x.getIdsToAuction()),
+        TO.map(x => x.map(Number))
     )(),
 
     getLineState: async (tokenId: number) => await pipe(
@@ -139,7 +143,15 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.map(data => data.auctionContract),
         TO.fromOption,
         TO2.flatTry(x => x.getMinPriceFor(tokenId))
-    )()
+    )(),
+    
+    // TODO Add 'notFound.png'
+    getImage: (tokenId: number) => pipe( 
+        get().auctionData,
+        O.map(data => data.tokenImagesUri),
+        O.map(uri => `${uri}/${tokenId}.png`),
+        O.getOrElse(() => 'notFound.png')
+    ),
 
 }})
 
