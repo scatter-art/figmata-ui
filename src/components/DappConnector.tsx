@@ -1,6 +1,7 @@
+import React, { CSSProperties } from 'react'
 import { useUserStore } from "../state/userStore"
 
-export const DappConnector = () => {
+export const DappConnector: React.FC<{style?: CSSProperties}> = ({ style }) => {
     
     const userConnected = useUserStore(state => state.userConnected)
     const connection = useUserStore(state => state.connectUser)
@@ -16,7 +17,8 @@ export const DappConnector = () => {
         else return 'Connect'
     }
 
-    return <button onClick={handleClick}>
+    return <button style={style} onClick={handleClick}>
         {getWalletText()}
     </button>
 }
+

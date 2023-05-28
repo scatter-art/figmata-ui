@@ -1,11 +1,11 @@
+import React, { CSSProperties } from 'react'
 import { useUserStore } from "../state/userStore"
 import * as O from 'fp-ts/Option'
 import { formatAddr } from "../utils/wallet"
 import { pipe } from "fp-ts/lib/function"
 
-export const UserAddress = () => {
+export const UserAddress: React.FC<{ style?: CSSProperties }> = ({ style }) => {
     const addr = useUserStore(state => state.userAddress)
-    //const connected = useUserStore(state => state.userConnected)
 
     const finalAddr = pipe(
         addr,
@@ -13,5 +13,5 @@ export const UserAddress = () => {
         O.getOrElse(() => '')
     )
 
-    return <span>{finalAddr}</span>
+    return <span style={style}>{finalAddr}</span>
 }

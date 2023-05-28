@@ -1,4 +1,3 @@
-import { useUserStore } from "../state/userStore"
 import * as O from 'fp-ts/Option'
 import { ethers } from "ethers"
 

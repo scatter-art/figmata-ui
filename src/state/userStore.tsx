@@ -1,5 +1,5 @@
 import { 
-    BrowserProvider, JsonRpcProvider, JsonRpcSigner, Provider
+    BrowserProvider, Provider
 } from 'ethers'
 import { create } from 'zustand'
 
@@ -88,7 +88,7 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
             get().disconnectUser()
         } else {
             console.log('Wallet connected')
-            get()._getUserProvider()
+            get()._getUserAddress()
             set({ userConnected: true }) 
         }
         return connection
@@ -97,9 +97,7 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     _getUserProvider: () => {
         const provider = O.tryCatch(() => new BrowserProvider(window.ethereum))
         set({ userProvider: provider })
-        get()._getUserAddress().then(addr => {
-            set({ userAddress: addr })
-        })
+        get()._getUserAddress().then(addr => set({ userAddress: addr }))
         return provider
     },
 
