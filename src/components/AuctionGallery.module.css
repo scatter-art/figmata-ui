@@ -1,0 +1,74 @@
+/* HOST ----------------------------------- */
+#auction-container {
+	max-height: 100%;
+	flex-grow: 1;
+	padding: var(--gap-o);
+	padding-left: calc(var(--gap-o) + var(--outer-border));
+	overflow-y: auto;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: var(--gap-o);
+	background-color: var(--clr-surface);
+	border-radius: var(--sp-2);
+	box-shadow: var(--ev-neu-outer);
+}
+
+@media screen and (max-width: 2700px) and (min-width: 1921px) {
+	#auction-container {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media screen and (max-width: 1920px) and (min-height: 1080px) {
+	#auction-container {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media screen and (max-width: 1680px) and (min-height: 1080px) {
+	#auction-container {
+		grid-template-columns: repeat(3, 1fr) !important;
+	}
+}
+
+@media screen and (max-width: 1600px) {
+	#auction-container {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media screen and (max-width: 1366px) {
+	#auction-container {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media screen and (max-width: 1280px) and (min-height: 1080px) {
+	#auction-container {
+		grid-template-columns: repeat(2, 1fr) !important;
+	}
+}
+
+@media screen and (max-width: 1120px) {
+	#auction-container {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media screen and (max-width: 960px) {
+	#auction-container {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media screen and (max-width: 760px) {
+	#auction-container {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media screen and (max-width: 520px) {
+	#auction-container {
+		grid-template-columns: repeat(1, 1fr) !important;
+	}
+}
