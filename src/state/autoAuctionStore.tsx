@@ -43,6 +43,11 @@ type ParallelAuctionStoreState = {
      */
     auctionData: O.Option<ParallelAuctionData>,
     
+    /**
+     * @returns The current selected line index for `auctionData.lines`.
+     */
+    _currentSelectedLineIndex: number,
+    
     // TODO do some checks on `tokenImagesUri`.
     setAuctionData: (
         auctionAddress: string[42], 
@@ -64,12 +69,25 @@ type ParallelAuctionStoreState = {
      */
     getMinPrice: (tokenId: number) => Promise<O.Option<bigint>>,
 
-    getImage: (tokenId: number) => string
+    getImage: (tokenId: number) => string,
+    
+    /**
+     * @returns The current selected line based on `currentSelectedLineIndex`.
+     */
+    getCurrentSelectedLine: () => O.Option<LineStateStruct>,
+
+    // TODO some kind of setCurrentSelectedLineIndex or whatever.
+    
+    getCollectionName: () => O.Option<string>,
+
+    getCurrentTokenName: () => O.Option<string>
 
 }
 
 export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, get) => {return {
     auctionData: O.none,
+
+    _currentSelectedLineIndex: 0,
 
     setAuctionData: async (
         auctionAddress: string[42], 
@@ -172,12 +190,28 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         TO2.flatTry(x => x.getMinPriceFor(tokenId))
     )(),
     
-    // TODO Add 'notFound.png'
     getImage: (tokenId: number) => pipe( 
         get().auctionData,
         O.map(data => data.tokenImagesUri),
         O.map(uri => `${uri}/${tokenId}.png`),
-        O.getOrElse(() => 'notFound.png')
+        O.getOrElse(() => '/404.png')
+    ),
+
+    getCurrentSelectedLine: () => pipe(
+        get().auctionData,
+        O.flatMap(data => data.lines[get()._currentSelectedLineIndex])
+    ),
+    
+    getCollectionName: () => pipe(
+        get().auctionData,
+        O.map(data => data.tokenName)
+    ),
+
+    getCurrentTokenName: () => pipe(
+        O.Do,
+        O.bind('name', get().getCollectionName),
+        O.bind('line', get().getCurrentSelectedLine),
+        O.map(({ name, line }) => `${name} #${line.head}`)
     ),
 
 }})

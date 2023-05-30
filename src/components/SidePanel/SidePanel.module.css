@@ -43,49 +43,6 @@
 	}
 }
 
-/* CONNECT BUTTON ------------------------ */
-#connect-button-container {
-	min-height: var(--sp-9);
-	padding: var(--gap-i);
-	border: 1px solid var(--clr-accent-secondary);
-	border-radius: var(--sp-12);
-	background-color: var(--clr-surface-secondary);
-}
-
-@media screen and (min-width: 1921px) {
-	#connect-button-container {
-		height: var(--sp-12);
-	}
-}
-
-#connect-button {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: var(--sp-12);
-	background-image: var(--clr-surface-secondary-gr);
-	box-shadow: var(--ev-neu-1-surface-secondary);
-	transition: 150ms;
-	cursor: pointer;
-}
-
-#connect-button:hover {
-	box-shadow: var(--ev-neu-1-hover-surface-secondary);
-}
-
-#connect-button span {
-	font-family: var(--font-pixel);
-	font-size: 1.25rem;
-	color: var(--clr-ink-on-heavy);
-	transition: 300ms;
-}
-
-#connect-button:hover span {
-	color: var(--clr-accent-secondary);
-}
-
 /* DETAILS -------------------------------- */
 #focus-token-details {
 	padding: var(--gap-i);

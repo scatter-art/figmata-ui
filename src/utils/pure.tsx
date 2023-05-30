@@ -49,6 +49,19 @@ export function unfunf <T,U>(
     return (t: T) => unfun(f(t))
 }
 
+// TODO This function is not pure, so it should be decoupled out of
+// this `pure.tsx`.
+export const formattedTimeLeft = (unixTimestamp: number): O.Option<string> => {
+    const diffInSeconds = Math.floor(unixTimestamp - Date.now() / 1000)
+    if (diffInSeconds < 0) return O.none
+
+    const hours = Math.floor(diffInSeconds / 3600)
+    const minutes = Math.floor((diffInSeconds % 3600) / 60)
+    const seconds = diffInSeconds % 60
+
+    return O.of(`${hours}:${minutes}:${seconds}`)
+};
+
 
 /**
  * @returns A new object map where all `O.Option<U>` is transformed

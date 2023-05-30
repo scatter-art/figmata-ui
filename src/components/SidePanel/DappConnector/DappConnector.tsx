@@ -1,7 +1,7 @@
-import React, { CSSProperties } from 'react'
-import { useUserStore } from "../state/userStore"
+import { useUserStore } from '../../../state/userStore'
+import style from './DappConnector.module.css'
 
-export const DappConnector: React.FC<{style?: CSSProperties}> = ({ style }) => {
+export const DappConnector = () => {
     
     const userConnected = useUserStore(state => state.userConnected)
     const connection = useUserStore(state => state.connectUser)
@@ -17,8 +17,13 @@ export const DappConnector: React.FC<{style?: CSSProperties}> = ({ style }) => {
         else return 'Connect'
     }
 
-    return <button style={style} onClick={handleClick}>
-        {getWalletText()}
-    </button>
+    return (
+        <div id={style['connect-button-container']}>
+            <div id={style['connect-button']} onClick={handleClick}>
+                <span>{getWalletText()}</span>
+            </div>
+        </div>
+    )
+
 }
 

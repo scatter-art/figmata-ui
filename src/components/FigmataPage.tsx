@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParallelAuctionState } from "../state/autoAuctionStore";
 import { useUserStore } from "../state/userStore";
-import { DappConnector } from "./DappConnector";
-import { UserAddress } from "./UserAddress";
-import { TokenCards } from "./TokenCards";
+import { Header } from "./Header";
+import { AuctionGallery } from "./AuctionGallery";
+import { Footer } from "./Footer";
+import { SidePanel } from "./SidePanel/SidePanel";
 
 export const FigmataPage: React.FC = () => {
     
@@ -11,10 +12,9 @@ export const FigmataPage: React.FC = () => {
     const auctionData = useParallelAuctionState(state => state.auctionData)
     const userConnected = useUserStore(state => state.userConnected)
     
-    // TODO This should only get queried once, using the default
-    // provider if needed.
     useEffect(() => {
-        // TODO This all should be decoupled into a config file.
+        // TODO This all should be decoupled into a config file and
+        // evaluated from a store.
         config(
             '0x0a3591da8d0f8Df57f4D1F5d56Ac8dE51124EECd',
             'Figmata',
@@ -24,11 +24,17 @@ export const FigmataPage: React.FC = () => {
 
     
     return <>
-        <DappConnector />
-        <br/>
-        <UserAddress />
-        <br/>
-        <TokenCards />
+        <div id="motif-border"></div>
+
+        <main>
+            <Header />
+            <div className="body">
+                <AuctionGallery />
+                <Footer />
+            </div>
+        </main>
+
+        <SidePanel />
     </>
     
 }
