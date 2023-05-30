@@ -1,0 +1,208 @@
+/* HOST ----------------------------------- */
+#side-panel {
+	--panel-w: 400px;
+	width: var(--panel-w);
+	padding: var(--gap-i);
+	overflow: hidden;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: var(--gap-o);
+	background-color: var(--clr-surface-secondary);
+	background-image: url('/public/cut-mat.webp');
+	background-size: auto 102.5%;
+	background-position: 25% center;
+	border-radius: var(--sp-2) 0 0 var(--sp-2);
+	box-shadow: var(--ev-neu-outer-surface-secondary);
+	transition: 300ms;
+	z-index: 6;
+}
+
+@media screen and (min-width: 1920px) {
+	#side-panel {
+		--panel-w: 600px;
+	}
+}
+
+@media screen and (max-width: 960px), screen and (max-height: 860px) {
+	#side-panel {
+		position: absolute;
+		top: var(--gap-i);
+		right: 0;
+		transform: translateX(var(--panel-w));
+		/*  */
+		/* This property needs to be toggled on via prop/data attribute etc for the panel reveal mechanism */
+		transform: translateX(0);
+		/*  */
+		bottom: var(--gap-i);
+	}
+
+	#sidepanel[data-is-visible='true'] {
+		right: 400px;
+	}
+}
+
+/* CONNECT BUTTON ------------------------ */
+#connect-button-container {
+	min-height: var(--sp-9);
+	padding: var(--gap-i);
+	border: 1px solid var(--clr-accent-secondary);
+	border-radius: var(--sp-12);
+	background-color: var(--clr-surface-secondary);
+}
+
+@media screen and (min-width: 1921px) {
+	#connect-button-container {
+		height: var(--sp-12);
+	}
+}
+
+#connect-button {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: var(--sp-12);
+	background-image: var(--clr-surface-secondary-gr);
+	box-shadow: var(--ev-neu-1-surface-secondary);
+	transition: 150ms;
+	cursor: pointer;
+}
+
+#connect-button:hover {
+	box-shadow: var(--ev-neu-1-hover-surface-secondary);
+}
+
+#connect-button span {
+	font-family: var(--font-pixel);
+	font-size: 1.25rem;
+	color: var(--clr-ink-on-heavy);
+	transition: 300ms;
+}
+
+#connect-button:hover span {
+	color: var(--clr-accent-secondary);
+}
+
+/* DETAILS -------------------------------- */
+#focus-token-details {
+	padding: var(--gap-i);
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--gap-i);
+	background-image: var(--clr-surface-secondary-gr);
+	border: 1px solid var(--clr-accent-secondary);
+	border-radius: var(--sp-3);
+}
+
+#focus-token-title {
+	min-height: var(--sp-5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: var(--ev-neu-1-inset-surface-secondary);
+	border-radius: var(--sp-2);
+}
+
+#focus-token-title span {
+	font-family: var(--font-pixel);
+	font-size: 1.125rem;
+	color: var(--clr-accent-secondary);
+}
+
+/* Auction details */
+#focus-token-auction-details-container {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--gap-ii);
+}
+
+.focus-token-auction-details-item {
+	height: var(--sp-4);
+	padding: 0 var(--gap-i);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	box-shadow: var(--ev-neu-1-inset-surface-secondary);
+	border-radius: var(--sp-1);
+}
+
+.focus-token-auction-details-item span {
+	font-family: var(--font-pixel);
+	font-size: 0.875rem;
+}
+
+.focus-token-auction-details-item span:first-child {
+	color: var(--clr-accent-secondary);
+}
+
+.focus-token-auction-details-item span:last-child {
+	color: var(--clr-ink-on-heavy);
+}
+
+/* IMAGE ---------------------------------- */
+
+#focus-token-image-container {
+	width: 100%;
+	height: 100%;
+	flex-grow: 1;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: var(--sp-2);
+}
+
+#focus-token-image {
+	height: 100%;
+	position: absolute;
+	border-radius: var(--sp-2);
+}
+
+/* PLACE BID BUTTON ----------------------- */
+#place-bid-button-container {
+	height: var(--sp-9);
+	padding: var(--gap-i);
+	border: 1px solid var(--clr-accent-secondary);
+	border-radius: var(--sp-12);
+	background-color: var(--clr-accent-secondary);
+}
+
+@media screen and (min-width: 1921px) {
+	#place-bid-button-container {
+		height: var(--sp-12);
+	}
+}
+
+#place-bid-button {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: var(--sp-12);
+	background-color: var(--clr-accent-secondary);
+	box-shadow: var(--ev-neu-1-accent-secondary);
+	transition: 150ms;
+	cursor: pointer;
+}
+
+#place-bid-button:hover {
+	box-shadow: var(--ev-neu-1-hover-accent-secondary);
+}
+
+#place-bid-button span {
+	font-family: var(--font-pixel);
+	font-size: 1.25rem;
+	color: var(--clr-accent-secondary-heavy);
+	transition: 300ms;
+}
+
+#place-bid-button:hover span {
+	transform: scale(1.12);
+}

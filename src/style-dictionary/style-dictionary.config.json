@@ -1,0 +1,16 @@
+{
+	"source": ["./src/style-dictionary/tokens/*.tokens.json"],
+	"platforms": {
+		"css": {
+			"transformGroup": "css",
+			"buildPath": "./src/style-dictionary/tokens/",
+			"files": [
+				{
+					"destination": "_STYLE_TOKENS_.css",
+					"format": "css/variables",
+					"options": { "outputReferences": true }
+				}
+			]
+		}
+	}
+}

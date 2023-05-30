@@ -1,0 +1,40 @@
+{
+	"ev": {
+		"neu-outer": {
+			"value": "1px 1px 3px {clr.ev-cast-x}, -1px -1px 3px {clr.ev-highlight}, 1px -1px 2px {clr.ev-occlusion}, -1px 1px 2px {clr.ev-occlusion}, inset -1px -1px 2px {clr.ev-occlusion}, inset 1px 1px 2px {clr.ev-highlight}"
+		},
+		"neu-outer-surface-secondary": {
+			"value": "1px 1px 3px {clr.ev-cast-secondary-surface}, -1px -1px 2px {clr.ev-highlight-secondary-surface}, 1px -1px 2px {clr.ev-occlusion-secondary-surface}, -1px 1px 2px {clr.ev-occlusion-secondary-surface}, inset -1px -1px {clr.ev-occlusion-m-secondary-surface}, inset 1px 1px 2px {clr.ev-highlight-s-secondary-surface}"
+		},
+		"neu-1": {
+			"value": "6px 6px 15px {clr.ev-cast}, -6px -6px 12px {clr.ev-highlight-x}, 6px -6px 12px {clr.ev-occlusion}, -6px 6px 12px {clr.ev-occlusion}, inset -1px -1px 2px {clr.ev-occlusion}, inset 1px 1px 2px {clr.ev-highlight} "
+		},
+		"neu-1-hover": {
+			"value": "12px 12px 30px {clr.ev-cast}, -12px -12px 24px {clr.ev-highlight-x}, 12px -12px 24px {clr.ev-occlusion}, -12px 12px 24px {clr.ev-occlusion}, inset -2px -2px 4px {clr.ev-occlusion}, inset 2px 2px 4px {clr.ev-highlight} "
+		},
+		"neu-1-inset": {
+			"value": "inset 1px 1px 3px {clr.ev-occlusion}, inset -1px -1px 2px {clr.ev-highlight-x}, inset 1px -1px 2px {clr.ev-occlusion-s}, inset -1px 1px 2px {clr.ev-occlusion-s}, -1px -1px 2px {clr.ev-occlusion-m}, 1px 1px 2px {clr.ev-highlight}"
+		},
+		"neu-inner-action": {
+			"value": "1px 1px 3px {clr.ev-occlusion}, -1px -1px 2px {clr.ev-highlight-x}, 1px -1px 2px {clr.ev-occlusion-s}, -1px 1px 2px {clr.ev-occlusion-s}"
+		},
+		"neu-1-surface-secondary": {
+			"value": "3px 3px 8px {clr.ev-cast-x-secondary-surface}, -3px -3px 6px {clr.ev-highlight-m-secondary-surface}, 3px -3px 6px {clr.ev-occlusion-s-secondary-surface}, -3px 3px 6px {clr.ev-occlusion-s-secondary-surface}"
+		},
+		"neu-1-hover-surface-secondary": {
+			"value": "6px 6px 16px {clr.ev-cast-x-secondary-surface}, -6px -6px 12px {clr.ev-highlight-m-secondary-surface}, 6px -6px 12px {clr.ev-occlusion-s-secondary-surface}, -6px 6px 12px {clr.ev-occlusion-s-secondary-surface}"
+		},
+		"neu-1-inset-surface-secondary": {
+			"value": "inset 4px 4px 10px {clr.ev-cast-x-secondary-surface}, -4px -4px 8px {clr.ev-highlight-m-secondary-surface}, 4px -4px 8px {clr.ev-occlusion-s-secondary-surface}, -4px 4px 8px {clr.ev-occlusion-s-secondary-surface}"
+		},
+		"neu-1-accent-secondary": {
+			"value": "3px 3px 8px {clr.ev-cast-accent-secondary}, -3px -3px 6px {clr.ev-highlight-accent-secondary}, 3px -3px 6px {clr.ev-occlusion-accent-secondary}, -3px 3px 6px {clr.ev-occlusion-accent-secondary}, inset -1px -1px 2px {clr.ev-cast-s-accent-secondary}, 1px 1px 2px {clr.ev-highlight-s-accent-secondary}"
+		},
+		"neu-1-hover-accent-secondary": {
+			"value": "6px 6px 16px {clr.ev-cast-accent-secondary}, -6px -6px 12px {clr.ev-highlight-accent-secondary}, 6px -6px 12px {clr.ev-occlusion-accent-secondary}, -6px 6px 12px {clr.ev-occlusion-accent-secondary}, inset -2px -2px 4px {clr.ev-cast-s-accent-secondary}, 2px 2px 4px {clr.ev-highlight-s-accent-secondary}"
+		},
+		"neu-1-accent-tertiary": {
+			"value": "4px 4px 10px {clr.ev-cast-accent-tertiary}, -4px -4px 8px {clr.ev-highlight-accent-tertiary}, 4px -4px 8px {clr.ev-occlusion-accent-tertiary}, -4px 4px 8px {clr.ev-occlusion-accent-tertiary}"
+		}
+	}
+}

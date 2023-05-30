@@ -1,0 +1,101 @@
+/* Header */
+#header {
+	height: 10vw;
+	min-height: min(10vw, calc(var(--sp-5) * 2));
+	max-height: calc(var(--sp-5) * 2);
+}
+
+.brand-container {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.brand-container > .title,
+.brand-container > .subtitle {
+	z-index: 1;
+}
+
+.brand-container > .title {
+	height: 40%;
+	width: 80%;
+	position: absolute;
+	top: 23%;
+	display: flex;
+	justify-content: center;
+}
+
+.brand-container > .title > img {
+	max-width: 40%;
+}
+
+#brand-word-figmata {
+	animation-name: figmata-glow;
+	animation-duration: 6000ms;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+	animation-timing-function: linear;
+}
+
+@keyframes figmata-glow {
+	0% {
+		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-a))
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-a));
+	}
+	33% {
+		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-b))
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-b));
+	}
+	66% {
+		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-c))
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-c));
+	}
+	100% {
+		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-d))
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-d));
+	}
+}
+
+.brand-container > .title > span {
+	position: absolute;
+	bottom: -84%;
+	font-family: var(--font-pixel);
+	color: var(--clr-ink-on-heavy);
+	/* font-size: min(1.25rem, 1.5vw); */
+	font-size: 1.25rem;
+	transform: translateX(-67%);
+}
+
+@media screen and (max-width: 1230px) {
+	.brand-container > .title > span {
+		bottom: -1.6vw;
+		font-size: 1.25vw;
+		transform: translateX(-9vw);
+	}
+}
+
+@media screen and (max-width: 960px) {
+	.brand-container > .title > span {
+		bottom: -3vw;
+		font-size: 2.25vw;
+		transform: translateX(-64%);
+	}
+}
+
+@media screen and (max-width: 860px) {
+	.brand-container > .title > span {
+		bottom: -3vw;
+		font-size: 2.25vw;
+		transform: translateX(-75%);
+	}
+}
+
+.brand-container > #brand-banner-container {
+	height: 100%;
+	max-width: 75%;
+	position: absolute;
+	mix-blend-mode: multiply;
+}

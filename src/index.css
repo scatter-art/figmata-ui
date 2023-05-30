@@ -1,13 +1,104 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+		'Droid Sans', 'Helvetica Neue', sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+	min-width: 100%;
+	max-width: 100%;
+	height: 100%;
+	overflow-x: hidden;
+	overscroll-behavior-y: none;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* CORE VARS ------------------------------ */
+:root {
+	--gap-o: var(--sp-3);
+	--gap-i: var(--sp-2);
+	--gap-ii: var(--sp-1);
+	--outer-border: var(--sp-5);
+}
+
+@media screen and (max-width: 720px) {
+	:root {
+		--outer-border: var(--sp-2);
+	}
+}
+
+/* APP LAYOUT ----------------------------- */
+.App {
+	height: 100%;
+	width: 100%;
+	padding: var(--gap-o) 0;
+	display: flex;
+	gap: var(--gap-o);
+	background-image: url('/public/bg-main.webp');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 960px), screen and (max-height: 860px) {
+	.App {
+		padding-right: var(--gap-o);
+	}
+}
+
+/* MOTIF BORDER --------------------------- */
+#motif-border {
+	width: var(--outer-border);
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background-image: url('/public/bg-motif-border.svg');
+	background-position: 0 0;
+	background-size: 100%;
+	animation-name: border-pan;
+	animation-duration: 60s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: linear;
+}
+
+@keyframes border-pan {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 0 400%;
+	}
+}
+
+/* MAIN ----------------------------------- */
+main {
+	flex-grow: 4;
+	display: flex;
+	flex-direction: column;
+	gap: var(--gap-i);
+}
+
+/* Body */
+main > .body {
+	overflow-y: auto;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	border-radius: 0 var(--sp-2) var(--sp-2) 0;
+	background-color: var(--clr-bg);
+	box-shadow: var(--ev-neu-outer);
 }
