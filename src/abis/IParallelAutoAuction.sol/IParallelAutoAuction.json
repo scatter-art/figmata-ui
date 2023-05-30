@@ -153,6 +153,46 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "lineStates",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint24",
+              "name": "head",
+              "type": "uint24"
+            },
+            {
+              "internalType": "uint40",
+              "name": "startTime",
+              "type": "uint40"
+            },
+            {
+              "internalType": "uint40",
+              "name": "endTime",
+              "type": "uint40"
+            },
+            {
+              "internalType": "address",
+              "name": "currentWinner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint96",
+              "name": "currentPrice",
+              "type": "uint96"
+            }
+          ],
+          "internalType": "struct LineState[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint24",

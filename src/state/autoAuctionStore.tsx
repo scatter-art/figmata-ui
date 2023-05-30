@@ -3,6 +3,7 @@ import { create } from 'zustand'
 
 import * as O from 'fp-ts/Option'
 import * as TO from 'fp-ts/TaskOption'
+import * as A from 'fp-ts/Array'
 import { pipe } from 'fp-ts/lib/function'
 
 import { 
@@ -10,7 +11,6 @@ import {
     IExternallyMintable__factory,
     IParallelAutoAuction, IParallelAutoAuction__factory 
 } from '../types'
-import { IERC721 } from '../types/IERC721'
 
 import { useUserStore } from './userStore'
 import { TO2 } from '../utils/pure'
@@ -23,7 +23,8 @@ type ParallelAuctionData = {
     readonly auctionedTokenAddress: string,
     readonly auctionedToken: IExternallyMintable,
     readonly tokenName: string,
-    readonly tokenImagesUri: string
+    readonly tokenImagesUri: string,
+    readonly lines: O.Option<LineStateStruct>[]
 }
 
 /**
@@ -41,13 +42,14 @@ type ParallelAuctionStoreState = {
      * all properties must be set.
      */
     auctionData: O.Option<ParallelAuctionData>,
-
+    
     // TODO do some checks on `tokenImagesUri`.
     setAuctionData: (
         auctionAddress: string[42], 
         auctionedTokenName: string, 
         tokenImagesUri: string
     ) => void,
+
 
     getIdsToAuction: () => Promise<O.Option<number[]>>,
     
@@ -74,7 +76,14 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         auctionedTokenName: string, 
         tokenImagesUri: string
     ) => {
-        
+
+        // This condition ensures `auctionData` immutability since
+        // this function is quite expensive to evaluate. Note that by 
+        // design, the condition will only be true if all `auctionData`
+        // fields are correctly set, ie, theres no need to reevaluate
+        // this function.
+        if (O.isSome(get().auctionData)) return
+
         //const getBestProvider = useUserStore(state => state.getBestProvider)
         const getBestProvider = useUserStore.getState().getBestProvider
 
@@ -107,6 +116,23 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
                 IExternallyMintable__factory.connect(tokenAddress, provider)
             )
         )
+
+        const maxSupply = await pipe(
+            TO.fromOption(auctionedToken),
+            TO2.flatTry(token => token.maxSupply())
+        )()
+
+        const lineOpts = await pipe(
+            O.Do,
+            O.bind('auction', () => auctionContract),
+            O.bind('maxSupply', () => maxSupply),
+            TO.fromOption,
+            TO.bind('lines', ({ auction }) => TO.tryCatch(() => auction.lineStates())),
+            TO.map(({ lines, maxSupply }) => pipe(
+                lines,
+                A.map(O.fromPredicate(line => maxSupply >= line.head))
+            ))
+        )()
         
         // Build the final data by unwrapping all Options.
         const data: O.Option<ParallelAuctionData> = pipe(
@@ -116,9 +142,10 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             O.bind('auctionedToken', () => auctionedToken),
             O.bind('tokenName', () => O.of(auctionedTokenName)),
             O.bind('tokenImagesUri', () => O.of(tokenImagesUri)),
+            O.bind('lines', () => lineOpts),
             O.map((data) => ({...data, auctionAddress}))
         )
-
+        
         set({ auctionData: data })
     },
     
