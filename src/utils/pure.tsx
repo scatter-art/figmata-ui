@@ -56,10 +56,13 @@ export const formattedTimeLeft = (unixTimestamp: number): O.Option<string> => {
     if (diffInSeconds < 0) return O.none
 
     const hours = Math.floor(diffInSeconds / 3600)
-    const minutes = Math.floor((diffInSeconds % 3600) / 60)
-    const seconds = diffInSeconds % 60
+    const mins = Math.floor((diffInSeconds % 3600) / 60)
+    const secs = diffInSeconds % 60
+    
+    const fmins = mins < 10 ? `0${mins.toString()}` : mins.toString()
+    const fsecs = secs < 10 ? `0${secs.toString()}` : secs.toString()
 
-    return O.of(`${hours}:${minutes}:${seconds}`)
+    return O.of(`${hours}:${fmins}:${fsecs}`)
 };
 
 

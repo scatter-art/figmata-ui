@@ -14,11 +14,13 @@ interface AuctionCardProps {
 export const AuctionCard: React.FC<AuctionCardProps> = ({ line }) => {
 
     const getImg = useParallelAuctionState(state => state.getImage)
+    const updateLine = useParallelAuctionState(state => state.updateLine)
+    const setLine = useParallelAuctionState(state => state.setCurrentSelectedLine)
 
     const imageUrl = pipe(
         line,
-        O.map(line => getImg(Number(line.head))),
-        O.getOrElse(() => getImg(0))
+        O.map(line => getImg(O.of(Number(line.head)))),
+        O.getOrElse(() => getImg(O.none))
     )
 
     const currentBid = pipe(
@@ -32,8 +34,13 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ line }) => {
         O.map(line => Number(line.endTime)),
     )
 
+    const onCardClick = async () => {
+        const newLine = await updateLine(line)
+        setLine(newLine)
+    }
+
 	return (
-		<div className={style['auction-card']}>
+		<div className={style['auction-card']} onClick={onCardClick}>
 			<div className={style['thumbnail-container']}>
 				<div 
                     className={style['thumbnail']}

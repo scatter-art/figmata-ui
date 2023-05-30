@@ -10,6 +10,7 @@ export const FigmataPage: React.FC = () => {
     const config = useParallelAuctionState(state => state.setAuctionData)
     const auctionData = useParallelAuctionState(state => state.auctionData)
     const userConnected = useUserStore(state => state.userConnected)
+    const updateContractProviders = useParallelAuctionState(state => state.updateContractsProvider)
     
     useEffect(() => {
         // TODO This all should be decoupled into a config file and
@@ -19,7 +20,10 @@ export const FigmataPage: React.FC = () => {
             'Figmata',
             'https://ipfs.io/ipfs/bafybeih5mqafo34424swmfdboww3s2tvfmzoojbip4jmcjbg5n3fl7edee'
         )
+
     }, [userConnected, auctionData]);
+
+    useEffect(() => updateContractProviders(), [userConnected])
 
     
     return <>

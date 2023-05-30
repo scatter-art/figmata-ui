@@ -35,8 +35,8 @@ export const SidePanel: React.FC = () => {
 
     const imageUrl = pipe(
         line,
-        O.map(line => getImg(Number(line.head))),
-        O.getOrElse(() => getImg(0))
+        O.map(line => getImg(O.of(Number(line.head)))),
+        O.getOrElse(() => getImg(O.none))
     )
 
     const currentWinner = pipe(

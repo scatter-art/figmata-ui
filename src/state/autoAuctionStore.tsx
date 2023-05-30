@@ -23,8 +23,7 @@ type ParallelAuctionData = {
     readonly auctionedTokenAddress: string,
     readonly auctionedToken: IExternallyMintable,
     readonly tokenName: string,
-    readonly tokenImagesUri: string,
-    lines: O.Option<LineStateStruct>[]
+    readonly tokenImagesUri: string
 }
 
 /**
@@ -43,55 +42,46 @@ type ParallelAuctionStoreState = {
      */
     auctionData: O.Option<ParallelAuctionData>,
     
-    /**
-     * @returns The current selected line index for `auctionData.lines`.
-     */
     currentSelectedLine: O.Option<LineStateStruct>,
+
+    lines: O.Option<O.Option<LineStateStruct>[]>,
     
-    // TODO do some checks on `tokenImagesUri`.
+    setCurrentSelectedLine: (line: O.Option<LineStateStruct>) => void,
+
+    /**
+     * @dev Updates in `lines` the inputed `line`.
+     * @returns A new updated line.
+     */
+    updateLine: (line: O.Option<LineStateStruct>) => Promise<O.Option<LineStateStruct>>,
+
     setAuctionData: (
         auctionAddress: string[42], 
         auctionedTokenName: string, 
         tokenImagesUri: string
     ) => void,
-
-
-    getIdsToAuction: () => Promise<O.Option<number[]>>,
     
     /**
-     * @returns An maybe `LineStateStruct`. This type should hold
-     * enough information to place bids, if not, see `getMinPrice`.
+     * @dev This function will reinitialize `auctionData` but using
+     * the user provider if its set.
      */
-    getLineState: (tokenId: number) => Promise<O.Option<LineStateStruct>>,
-    
-    /**
-     * @returns The minimum price the user should pay for a bid of `tokenId`.
-     */
-    getMinPrice: (tokenId: number) => Promise<O.Option<bigint>>,
+    updateContractsProvider: () => void,
 
-    getImage: (tokenId: number) => string,
+    getImage: (tokenId: O.Option<number>) => string,
 
-    // TODO some kind of setCurrentSelectedLineIndex or whatever.
-    
     getCollectionName: () => O.Option<string>,
 
-    getCurrentTokenName: () => O.Option<string>,
-    
-    getAllCurrentLines: () => O.Option<LineStateStruct>[],
-    
-    /**
-     * @dev Updates in `auctionData.lines` the inputed `line`.
-     * @returns A new updated line.
-     */
-    updateLine: (line: O.Option<LineStateStruct>) => Promise<O.Option<LineStateStruct>>,
+    getCurrentTokenName: () => O.Option<string>
 
 }
 
 export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, get) => {return {
 
     auctionData: O.none,
-
     currentSelectedLine: O.none,
+    lines: O.none,
+    
+    setCurrentSelectedLine: (line: O.Option<LineStateStruct>) => 
+        set({ currentSelectedLine: line }),
 
     setAuctionData: async (
         auctionAddress: string[42], 
@@ -104,21 +94,11 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         // design, the condition will only be true if all `auctionData`
         // fields are correctly set, ie, theres no need to reevaluate
         // this function.
-        if (O.isSome(get().auctionData)) return
+        if (O.isSome(get().auctionData) && O.isSome(get().lines)) return
 
-        //const getBestProvider = useUserStore(state => state.getBestProvider)
-        const getBestProvider = useUserStore.getState().getBestProvider
-
-        // If the new `addr` is the same as `currentAddress` just return
-        // to evite redundant computations.
-        if (pipe(pipe(
-            get().auctionData,
-            O.map(d => d.auctionAddress)
-        ), O.exists(addr => addr === auctionAddress))) return
-        
         if (!ethers.isAddress(auctionAddress)) return
         
-        const bestProvider = getBestProvider()
+        const bestProvider = useUserStore.getState().getBestProvider()
         
         const auctionContract = pipe(
             bestProvider,
@@ -139,6 +119,20 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             )
         )
 
+        // Build the final data by unwrapping all Options.
+        const data: O.Option<ParallelAuctionData> = pipe(
+            O.Do,
+            O.bind('auctionContract', () => auctionContract),
+            O.bind('auctionedTokenAddress', () => auctionedTokenAddr),
+            O.bind('auctionedToken', () => auctionedToken),
+            O.bind('tokenName', () => O.of(auctionedTokenName)),
+            O.bind('tokenImagesUri', () => O.of(tokenImagesUri)),
+            O.map((data) => ({...data, auctionAddress}))
+        )
+        
+        set({ auctionData: data })
+        
+        // Once updated the auction data we get all the lines state.
         const maxSupply = await pipe(
             TO.fromOption(auctionedToken),
             TO2.flatTry(token => token.maxSupply())
@@ -153,78 +147,75 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             TO.map(({ lines, maxSupply }) => pipe(
                 lines,
                 A.map(O.fromPredicate(line => maxSupply >= line.head))
-            ))
+            )),
         )()
         
-        // Build the final data by unwrapping all Options.
-        const data: O.Option<ParallelAuctionData> = pipe(
+        set({ lines: lineOpts })
+        
+        const defaultLine = pipe(
+            lineOpts,
+            O.flatMap(lines => lines[0])
+        )
+
+        set({ currentSelectedLine: defaultLine })
+
+    },
+
+    updateContractsProvider: () => {
+        const userProviderOpt = useUserStore.getState().userProvider
+        const auctionDataOpt = get().auctionData
+
+        if (O.isNone(auctionDataOpt) || O.isNone(userProviderOpt)) return
+
+        const userProvider = userProviderOpt.value
+        const data = auctionDataOpt.value
+        
+        const auctionContract = IParallelAutoAuction__factory.connect(data.auctionAddress, userProvider)
+        const auctionedToken = IExternallyMintable__factory.connect(data.auctionedTokenAddress, userProvider)
+
+        set({ auctionData: O.of({...data, auctionContract, auctionedToken }) })
+    },
+
+    updateLine: async (lineToUpdate: O.Option<LineStateStruct>) => {
+        const newLine = await pipe(
             O.Do,
-            O.bind('auctionContract', () => auctionContract),
-            O.bind('auctionedTokenAddress', () => auctionedTokenAddr),
-            O.bind('auctionedToken', () => auctionedToken),
-            O.bind('tokenName', () => O.of(auctionedTokenName)),
-            O.bind('tokenImagesUri', () => O.of(tokenImagesUri)),
-            O.bind('lines', () => lineOpts),
-            O.map((data) => ({...data, auctionAddress}))
+            O.bind('lineToUpdate', () => lineToUpdate),
+            O.bind('auctionData', () => get().auctionData),
+            TO.fromOption,
+            TO.flatMap(({ auctionData, lineToUpdate }) => TO.tryCatch( 
+                () => auctionData.auctionContract.lineState(Number(lineToUpdate.head))
+            )),
+        )()
+    
+        const allLines = get().lines
+        
+        const indexToMutate = pipe(
+            allLines,
+            O.map(lines => lines.indexOf(lineToUpdate))
+        )
+
+        const updatedLines = pipe(
+            O.Do,
+            O.bind('i', () => indexToMutate),
+            O.bind('allLines', () => allLines),
+            O.map(({ i, allLines }) => {
+                if (O.isSome(allLines[i])) allLines[i] = newLine
+                return allLines
+            })
         )
         
-        set({ auctionData: data })
-    },
-    
-    // TODO Abstract this general pattern in a higher order function.
-    getIdsToAuction: async () => await pipe(
-        get().auctionData,
-        O.map(data => data.auctionContract),
-        TO.fromOption,
-        TO2.flatTry(x => x.getIdsToAuction()),
-        TO.map(x => x.map(Number))
-    )(),
-
-    getLineState: async (tokenId: number) => await pipe(
-        get().auctionData,
-        O.map(data => data.auctionContract),
-        TO.fromOption,
-        TO2.flatTry(x => x.lineState(tokenId))
-    )(),
-
-    getMinPrice: async (tokenId: number) => await pipe(
-        get().auctionData,
-        O.map(data => data.auctionContract),
-        TO.fromOption,
-        TO2.flatTry(x => x.getMinPriceFor(tokenId))
-    )(),
-    
-    getImage: (tokenId: number) => pipe( 
-        get().auctionData,
-        O.map(data => data.tokenImagesUri),
-        O.map(uri => `${uri}/${tokenId}.png`),
-        O.getOrElse(() => '/404.png')
-    ),
-    
-    updateLine: async (line: O.Option<LineStateStruct>) => {
-        const newLine = await pipe(
-            line,
-            TO.fromOption,
-            TO2.flatTry(line => get().getLineState(Number(line.head))),
-            TO.flatMap(x => TO.fromOption(x)),
-        )()
-    
-        const allLines = get().getAllCurrentLines()
-        const lineIndex = allLines.indexOf(line)
-        
-        allLines[lineIndex] = newLine
-
-        set(({ auctionData }) => ({ auctionData: pipe(
-            auctionData,
-            O.map(data => {
-                data.lines = allLines;
-                return data
-            })
-        ) }))
-
+        set({ lines: updatedLines })
         return newLine
     },
-
+    
+    getImage: (tokenId: O.Option<number>) => pipe( 
+        O.Do,
+        O.bind('id', () => tokenId),
+        O.bind('data', () => get().auctionData),
+        O.bind('uri', ({ data }) => O.of(data.tokenImagesUri)),
+        O.map(({ id, uri })=> `${uri}/${id}.png`),
+        O.getOrElse(() => '/404.png')
+    ),
     
     getCollectionName: () => pipe(
         get().auctionData,
@@ -237,13 +228,6 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.bind('line', () => get().currentSelectedLine),
         O.map(({ name, line }) => `${name} #${line.head}`)
     ),
-    
-    // TODO The `fill` shouldn't be hardcoded.
-    getAllCurrentLines: () => pipe(
-        get().auctionData,
-        O.map(data => data.lines),
-        O.getOrElse(() => new Array<O.Option<LineStateStruct>>(10).fill(O.none))
-    )
 
 }})
 
