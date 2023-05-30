@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParallelAuctionState } from "../state/autoAuctionStore";
 import { useUserStore } from "../state/userStore";
 import { Header } from "./Header";
-import { AuctionGallery } from "./AuctionGallery";
-import { Footer } from "./Footer";
 import { SidePanel } from "./SidePanel/SidePanel";
+import { AuctionHouseBody } from "./AuctionHouseBody/AuctionHouseBody";
 
 export const FigmataPage: React.FC = () => {
     
@@ -28,10 +27,7 @@ export const FigmataPage: React.FC = () => {
 
         <main>
             <Header />
-            <div className="body">
-                <AuctionGallery />
-                <Footer />
-            </div>
+            <AuctionHouseBody />
         </main>
 
         <SidePanel />

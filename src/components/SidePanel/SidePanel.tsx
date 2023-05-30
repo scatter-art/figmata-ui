@@ -8,12 +8,13 @@ import style from './SidePanel.module.css'
 import { formatAddr, fromWei } from '../../utils/web3'
 import { Countdown } from '../Countdown'
 
+export const PROVIDER_DOWN_MESSAGE = () => 'Scatter is down, connect wallet :('
+
 export const SidePanel: React.FC = () => {
     
-    const PROVIDER_DOWN_MESSAGE = () => 'Scatter is down, connect wallet :('
 
     const getName = useParallelAuctionState(state => state.getCurrentTokenName)
-    const line = useParallelAuctionState(state => state.getCurrentSelectedLine)()
+    const line = useParallelAuctionState(state => state.currentSelectedLine)
     const getImg = useParallelAuctionState(state => state.getImage)
     
     const tokenName = pipe(
