@@ -74,10 +74,10 @@ export const PlaceBidButton = () => {
     )
 
     const handleBidConfirmation = async () => {
-        console.log(userProv)
-        console.log(inputValue)
-        const txRes = await createBid(inputValue)
-        console.log(txRes)
+        const tx = await createBid(inputValue)
+        if (O.isNone(tx)) return // TODO Handle signature failed
+        const receipt = await tx.value.wait()
+        console.log(receipt)
         const newLine = await updateLine(line) 
         setNewLine(newLine)
         handleModalClosing()
@@ -97,7 +97,7 @@ export const PlaceBidButton = () => {
                 type='number'
                 placeholder={minPrice}
                 min={minPrice}
-                step='0.1'
+                step={minPrice.toString()}
                 onChange={event => handleNewInput(parseFloat(event.target.value))}
                 value={inputValue}
             />

@@ -248,35 +248,22 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.map(data => data.auctionConfig),
         O.map(x => x)
     ),
+    
+    // TODO This solution is ugly af, can't I use the user wallet for
+    // signing and querying at the same time?
+    createBid: async (value: number) => await pipe(
+        O.Do,
+        O.bind('signer', () => useUserStore.getState().userSigner),
+        O.bind('data', () => get().auctionData),
+        O.bind('auction', ({ data }) => O.of(data.auctionContract)),
+        O.bind('line', () => get().currentSelectedLine),
+        TO.fromOption,
+        TO.flatMap(({ auction, line, signer }) => TO.tryCatch(() => 
+            (auction.connect(signer) as typeof auction)
+                .createBid(line.head, { value: toWei(value)})
+        ))
+    )()
 
-    createBid: async (value: number) => { 
-        
-        /*const userSigner = useUserStore(state => state.userSigner)
-        const data = get().auctionData
-        const line = get().currentSelectedLine
-
-        if (O.isNone(data) || O.isNone(line) || O.isNone(userSigner)) return O.none
-
-        const auction = data.value.auctionContract
-        const res = await auction.createBid(line.value.head, { value: toWei(value) })
-        console.log(res)
-        
-        return O.some(res)*/
-
-        return await pipe(
-            O.Do,
-            O.bind('signer', () => useUserStore.getState().userSigner),
-            O.bind('data', () => get().auctionData),
-            O.bind('auction', ({ data }) => O.of(data.auctionContract)),
-            O.bind('line', () => get().currentSelectedLine),
-            TO.fromOption,
-            TO.flatMap(({ auction, line, signer }) => TO.tryCatch(() => 
-                (auction.connect(signer) as IParallelAutoAuction)
-                    .createBid(line.head, { value: toWei(value)})
-            ))
-        )()
-
-    }
 
 }})
 
