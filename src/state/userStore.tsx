@@ -1,5 +1,5 @@
 import { 
-    BrowserProvider, Provider
+    BrowserProvider, JsonRpcSigner, Provider
 } from 'ethers'
 import { create } from 'zustand'
 
@@ -17,6 +17,7 @@ import { formatAddr, formatOptAddr } from '../utils/web3'
  */
 export type UserStoreState = {
     userProvider: O.Option<BrowserProvider>,
+    userSigner: O.Option<JsonRpcSigner>,
     userAddress: O.Option<string>,
     formattedUserAddress: string,
     defaultProvider: O.Option<Provider>,
@@ -51,11 +52,14 @@ export type UserStoreState = {
     _getUserProvider: () =>  O.Option<BrowserProvider>,
 
     _getUserAddress: () => Promise<O.Option<string>>
+
+    _getUserSigner: () => Promise<O.Option<JsonRpcSigner>>
 }
 
 
 export const useUserStore = create<UserStoreState>((set, get) => ({
     userProvider: O.none,
+    userSigner: O.none,
     userAddress: O.none,
     formattedUserAddress: '',
     defaultProvider: O.none,
@@ -79,7 +83,8 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
             userProvider: O.none,
             userAddress: O.none,
             formattedUserAddress: '',
-            userConnected: false
+            userConnected: false,
+            userSigner: O.none,
         })
     },
 
@@ -108,6 +113,7 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
         get()._getUserAddress().then(addr => set({ 
             userAddress: addr, formattedUserAddress: formatOptAddr(addr)
         }))
+        get()._getUserSigner().then(userSigner => set({ userSigner }))
         return provider
     },
 
@@ -115,6 +121,11 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
         TO.fromOption(get().userProvider),
         TO2.flatTry(provider => provider.getSigner()),
         TO.map(signer => signer.address)
+    )(),
+
+    _getUserSigner: () => pipe(
+        TO.fromOption(get().userProvider),
+        TO2.flatTry(provider => provider.getSigner())
     )()
 
 }))

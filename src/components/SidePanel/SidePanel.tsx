@@ -84,7 +84,7 @@ export const SidePanel: React.FC = () => {
 			</div>
             
             <PlaceBidButton />
-
+            
 		</div>
 	)
 }

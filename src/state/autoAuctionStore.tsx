@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { ethers, Signer } from 'ethers'
 import { create } from 'zustand'
 
 import * as O from 'fp-ts/Option'
@@ -14,12 +14,14 @@ import {
 
 import { useUserStore } from './userStore'
 import { TO2 } from '../utils/pure'
-import { LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
+import { AuctionConfigStruct, LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
+import { toWei } from '../utils/web3'
 
 
 type ParallelAuctionData = {
     readonly auctionAddress: string,
     readonly auctionContract: IParallelAutoAuction,
+    readonly auctionConfig: AuctionConfigStruct,
     readonly auctionedTokenAddress: string,
     readonly auctionedToken: IExternallyMintable,
     readonly tokenName: string,
@@ -70,7 +72,11 @@ type ParallelAuctionStoreState = {
 
     getCollectionName: () => O.Option<string>,
 
-    getCurrentTokenName: () => O.Option<string>
+    getCurrentTokenName: () => O.Option<string>,
+
+    getAuctionConfig: () => O.Option<AuctionConfigStruct>,
+
+    createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>
 
 }
 
@@ -105,6 +111,13 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             O.map(prov => IParallelAutoAuction__factory.connect(auctionAddress, prov))
         )
 
+        const auctionConfig = await pipe(
+            auctionContract,
+            TO.fromOption,
+            TO2.flatTry(auction => auction.auctionConfig())
+        )()
+
+
         const auctionedTokenAddr = await pipe(
             TO.fromOption(auctionContract),
             TO2.flatTry(auction => auction.getAuctionedToken())
@@ -123,6 +136,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         const data: O.Option<ParallelAuctionData> = pipe(
             O.Do,
             O.bind('auctionContract', () => auctionContract),
+            O.bind('auctionConfig', () => auctionConfig),
             O.bind('auctionedTokenAddress', () => auctionedTokenAddr),
             O.bind('auctionedToken', () => auctionedToken),
             O.bind('tokenName', () => O.of(auctionedTokenName)),
@@ -172,7 +186,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         
         const auctionContract = IParallelAutoAuction__factory.connect(data.auctionAddress, userProvider)
         const auctionedToken = IExternallyMintable__factory.connect(data.auctionedTokenAddress, userProvider)
-
+    
         set({ auctionData: O.of({...data, auctionContract, auctionedToken }) })
     },
 
@@ -228,6 +242,41 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.bind('line', () => get().currentSelectedLine),
         O.map(({ name, line }) => `${name} #${line.head}`)
     ),
+
+    getAuctionConfig: () => pipe(
+        get().auctionData,
+        O.map(data => data.auctionConfig),
+        O.map(x => x)
+    ),
+
+    createBid: async (value: number) => { 
+        
+        /*const userSigner = useUserStore(state => state.userSigner)
+        const data = get().auctionData
+        const line = get().currentSelectedLine
+
+        if (O.isNone(data) || O.isNone(line) || O.isNone(userSigner)) return O.none
+
+        const auction = data.value.auctionContract
+        const res = await auction.createBid(line.value.head, { value: toWei(value) })
+        console.log(res)
+        
+        return O.some(res)*/
+
+        return await pipe(
+            O.Do,
+            O.bind('signer', () => useUserStore.getState().userSigner),
+            O.bind('data', () => get().auctionData),
+            O.bind('auction', ({ data }) => O.of(data.auctionContract)),
+            O.bind('line', () => get().currentSelectedLine),
+            TO.fromOption,
+            TO.flatMap(({ auction, line, signer }) => TO.tryCatch(() => 
+                (auction.connect(signer) as IParallelAutoAuction)
+                    .createBid(line.head, { value: toWei(value)})
+            ))
+        )()
+
+    }
 
 }})
 

@@ -40,3 +40,69 @@
 #place-bid-button:hover span {
 	transform: scale(1.12);
 }
+
+
+/* BID DIALOG -------------- */
+
+dialog {
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    scale: 0;
+    margin: auto;
+    border: none;
+    border-radius: 10px;
+    transition: all 0s;
+}
+
+dialog[open] {
+    opacity: 1;
+    scale: 2;
+    padding: 30px 40px;
+    transition: all 0.25s;
+}
+
+#cancel-modal, #confirm-modal {
+    margin-top: 10px;
+	height: var(--sp-4);
+	border-style: none;
+	border: 1px solid transparent;
+	border-radius: var(--sp-1);
+	background-color: var(--clr-surface);
+	font-family: var(--font-pixel);
+	color: var(--clr-accent-heavy);
+	box-shadow: var(--ev-neu-inner-action);
+	cursor: pointer;
+	transition: 150ms;
+}
+
+#cancel-modal:hover, #confirm-modal:hover {
+	border: 1px solid var(--clr-accent);
+}
+
+#confirm-modal {
+    width: 48%;
+    margin-right: 2%;
+
+}
+
+#cancel-modal {
+    width: 48%;
+    margin-left: 2%;
+}
+
+#bid-input {
+    border: 2px solid;
+    border-color: var(--clr-surface);
+    border-radius: 10px;
+    padding: 4px 10px;
+    transition: border-radius 0.25s ease;
+}
+
+#bid-input:focus {
+    border: 2px solid;
+    border-color: var(--clr-accent);
+    outline: none;
+    border-radius: 100px;
+    padding: 4px 10px;
+}

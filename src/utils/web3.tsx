@@ -30,4 +30,7 @@ export const formatOptAddr = (
     O.getOrElse(() => '')
 )
 
-export const fromWei = (x: BigNumberish) => ethers.formatUnits(x, 'ether')
+export const fromWei = (x: BigNumberish | bigint) => ethers.formatUnits(x, 'ether')
+export const toWei = (x: number) => ethers.parseEther(x.toString())
+
+
