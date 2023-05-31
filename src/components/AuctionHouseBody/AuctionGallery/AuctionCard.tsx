@@ -1,11 +1,11 @@
 import React from 'react'
 import style from './AuctionCard.module.css'
 import * as O from 'fp-ts/Option'
-import { LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 import { pipe } from 'fp-ts/lib/function'
-import { useParallelAuctionState } from '../state/autoAuctionStore'
-import { fromWei } from '../utils/web3'
-import { Countdown } from './Countdown'
+import { useParallelAuctionState } from '../../../state/autoAuctionStore'
+import { LineStateStruct } from '../../../types/IHoldsParallelAutoAuctionData'
+import { fromWei } from '../../../utils/web3'
+import { Countdown } from '../../Utils/Countdown'
 
 interface AuctionCardProps {
     line: O.Option<LineStateStruct>

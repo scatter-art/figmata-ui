@@ -1,8 +1,8 @@
 import { pipe } from 'fp-ts/lib/function'
-import { useParallelAuctionState } from '../../state/autoAuctionStore'
-import { AuctionCard } from '../AuctionCard'
 import style from './AuctionGallery.module.css'
 import * as O from 'fp-ts/Option'
+import { useParallelAuctionState } from '../../../state/autoAuctionStore'
+import { AuctionCard } from './AuctionCard'
 
 export const AuctionGallery = () => {
 

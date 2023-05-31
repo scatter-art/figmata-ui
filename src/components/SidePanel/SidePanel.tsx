@@ -6,7 +6,8 @@ import * as O from 'fp-ts/Option'
 import style from './SidePanel.module.css'
 
 import { formatAddr, fromWei } from '../../utils/web3'
-import { Countdown } from '../Countdown'
+import { Countdown } from '../Utils/Countdown'
+import { PlaceBidButton } from './PlaceBidButton/PlaceBidButton'
 
 export const PROVIDER_DOWN_MESSAGE = () => 'Scatter is down, connect wallet :('
 
@@ -81,12 +82,9 @@ export const SidePanel: React.FC = () => {
 					</div>
 				</div>
 			</div>
+            
+            <PlaceBidButton />
 
-			<div id={style['place-bid-button-container']}>
-				<div id={style['place-bid-button']}>
-					<span>PLACE YOUR BID</span>
-				</div>
-			</div>
 		</div>
 	)
 }

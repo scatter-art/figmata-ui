@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useParallelAuctionState } from "../state/autoAuctionStore";
 import { useUserStore } from "../state/userStore";
-import { Header } from "./Header";
 import { SidePanel } from "./SidePanel/SidePanel";
 import { AuctionHouseBody } from "./AuctionHouseBody/AuctionHouseBody";
+import { Header } from "./Header/Header";
 
 export const FigmataPage: React.FC = () => {
     
@@ -16,7 +16,7 @@ export const FigmataPage: React.FC = () => {
         // TODO This all should be decoupled into a config file and
         // evaluated from a store.
         config(
-            '0x0a3591da8d0f8Df57f4D1F5d56Ac8dE51124EECd',
+            '0x3102B91D6c27213e570F85C6Ef0413D74234A4bc',
             'Figmata',
             'https://ipfs.io/ipfs/bafybeih5mqafo34424swmfdboww3s2tvfmzoojbip4jmcjbg5n3fl7edee'
         )

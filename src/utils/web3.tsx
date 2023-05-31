@@ -1,5 +1,6 @@
 import * as O from 'fp-ts/Option'
 import { BigNumberish, ethers } from "ethers"
+import { pipe } from 'fp-ts/lib/function'
 
 export const formatAddr = (
     addr: string[42], digitsToShow: number = 6
@@ -20,5 +21,13 @@ export const fformatAddr = (
     if (O.isSome(optF)) return optF.value
     else return ''
 }
+
+export const formatOptAddr = (
+    addr: O.Option<string[42]>, digitToShow: number = 6
+): string => pipe(
+    addr,
+    O.chain(addr => formatAddr(addr, digitToShow)),
+    O.getOrElse(() => '')
+)
 
 export const fromWei = (x: BigNumberish) => ethers.formatUnits(x, 'ether')

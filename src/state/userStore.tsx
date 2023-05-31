@@ -9,6 +9,7 @@ import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/lib/function'
 import { TE2, TO2 } from '../utils/pure'
+import { formatAddr, formatOptAddr } from '../utils/web3'
 
 /**
  * @notice The system should work even if `O.isNone(defaultProvider)`
@@ -17,6 +18,7 @@ import { TE2, TO2 } from '../utils/pure'
 export type UserStoreState = {
     userProvider: O.Option<BrowserProvider>,
     userAddress: O.Option<string>,
+    formattedUserAddress: string,
     defaultProvider: O.Option<Provider>,
     userConnected: boolean,
 
@@ -55,6 +57,7 @@ export type UserStoreState = {
 export const useUserStore = create<UserStoreState>((set, get) => ({
     userProvider: O.none,
     userAddress: O.none,
+    formattedUserAddress: '',
     defaultProvider: O.none,
     userConnected: false,
 
@@ -72,7 +75,12 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     disconnectUser: () => {
         console.log('Wallet disconnected')
         if (window.ethereum) window.ethereum.removeAllListeners();
-        set({ userProvider: O.none, userAddress: O.none, userConnected: false })
+        set({ 
+            userProvider: O.none,
+            userAddress: O.none,
+            formattedUserAddress: '',
+            userConnected: false
+        })
     },
 
     connectUser: async () => {
@@ -97,7 +105,9 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     _getUserProvider: () => {
         const provider = O.tryCatch(() => new BrowserProvider(window.ethereum))
         set({ userProvider: provider })
-        get()._getUserAddress().then(addr => set({ userAddress: addr }))
+        get()._getUserAddress().then(addr => set({ 
+            userAddress: addr, formattedUserAddress: formatOptAddr(addr)
+        }))
         return provider
     },
 

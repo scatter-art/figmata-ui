@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import { formattedTimeLeft } from "../utils/pure";
 import * as O from 'fp-ts/Option'
+import { formattedTimeLeft } from "../../utils/pure";
 
 export const Countdown: React.FC<{
     endTimestamp: number,
