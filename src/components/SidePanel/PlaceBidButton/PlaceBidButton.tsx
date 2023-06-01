@@ -66,12 +66,14 @@ export const PlaceBidButton = () => {
 
     const handleModalOppening = () => pipe(
         getModal(),
-        O.map(modal => modal.showModal())
+        O.map(modal => modal.showModal()),
+        O.map(() => updateLine(lineIndex))
     )
 
     const handleModalClosing = () => pipe(
         getModal(),
-        O.map(modal => modal.close())
+        O.map(modal => modal.close()),
+        O.map(() => updateLine(lineIndex))
     )
 
     const handleBidConfirmation = async () => {

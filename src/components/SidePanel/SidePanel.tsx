@@ -1,5 +1,5 @@
 import { pipe } from 'fp-ts/lib/function'
-import React from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useParallelAuctionState } from '../../state/autoAuctionStore'
 import { DappConnector } from './DappConnector/DappConnector'
 import * as O from 'fp-ts/Option'
@@ -14,12 +14,17 @@ export const PROVIDER_DOWN_MESSAGE = () => 'Scatter is down, connect wallet :('
 export const SidePanel: React.FC = () => {
     
     const getName = useParallelAuctionState(state => state.getCurrentTokenName)
-    const line = useParallelAuctionState(state => state.getCurrentSelectedLine)()
     const getImg = useParallelAuctionState(state => state.getImage)
-
-    // Selected line subscription so the state gets updated on its change.
-    useParallelAuctionState(state => state.currentLineIndex)
+    const lineUpdater = useParallelAuctionState(state => state.getCurrentSelectedLine)
     
+    // NOTE I need this ugly state to only update `line`
+    // some time after `lineIndex` gets updated. See this component
+    // `useEffect`.
+    const [ line, setLine ] = useState(lineUpdater())
+    const lineIndex = useParallelAuctionState(state => state.currentLineIndex)
+    
+    const sidePanelRef = useRef<HTMLDivElement>(null)
+
     const tokenName = pipe(
         getName(),
         O.getOrElse(PROVIDER_DOWN_MESSAGE)
@@ -47,9 +52,29 @@ export const SidePanel: React.FC = () => {
         O.flatMap(line => formatAddr(line.currentWinner.toString(), 11)),
         O.getOrElse(PROVIDER_DOWN_MESSAGE)
     )
+   
+
+    const isFirstRender = useRef(0)
+    
+    useLayoutEffect(() => {
+        // Ignore this hack.
+        if (isFirstRender.current < 2) {
+            isFirstRender.current++
+            return
+        }
+            
+        if (!sidePanelRef.current) return
+
+        sidePanelRef.current.style.transform = 'translateX(600px)'
+        setTimeout(() => {
+            setLine(lineUpdater())
+            sidePanelRef.current!.style.transform = 'translateX(0px)'
+        }, 250)
+
+    }, [lineIndex])
     
 	return (
-		<div id={style['side-panel']}>
+		<div id={style['side-panel']} ref={sidePanelRef}>
 
             <DappConnector />
 

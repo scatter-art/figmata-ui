@@ -73,6 +73,7 @@ type ParallelAuctionStoreState = {
      */
     updateLine: (lineIndexToUpdate: number) => Promise<O.Option<LineStateStruct>>,
     
+    /* --------------- CONTRACT INITIALIZATION --------------- */
     setAuctionData: (
         auctionAddress: string[42], 
         auctionedTokenName: string, 
@@ -84,6 +85,8 @@ type ParallelAuctionStoreState = {
      * the user provider if its set.
      */
     updateContractsProvider: () => void,
+    
+    /* ------------- GENERAL CONTRACT QUERIES ------------- */
 
     getImage: (tokenId: O.Option<number>) => string,
 
@@ -95,6 +98,8 @@ type ParallelAuctionStoreState = {
     
     createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
     
+
+    /* --------------- HELPER FUNCTIONS --------------- */
     /**
      * @dev It will set an event so the lines get automatically
      * updated after the auction time ends.

@@ -33,7 +33,6 @@
 		transform: translateX(var(--panel-w));
 		/*  */
 		/* This property needs to be toggled on via prop/data attribute etc for the panel reveal mechanism */
-		transform: translateX(0);
 		/*  */
 		bottom: var(--gap-i);
 	}
