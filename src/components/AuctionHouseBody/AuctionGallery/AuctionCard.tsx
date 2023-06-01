@@ -3,19 +3,19 @@ import style from './AuctionCard.module.css'
 import * as O from 'fp-ts/Option'
 import { pipe } from 'fp-ts/lib/function'
 import { useParallelAuctionState } from '../../../state/autoAuctionStore'
-import { LineStateStruct } from '../../../types/IHoldsParallelAutoAuctionData'
 import { fromWei } from '../../../utils/web3'
 import { Countdown } from '../../Utils/Countdown'
 
 interface AuctionCardProps {
-    line: O.Option<LineStateStruct>
+    lineIndex: number;
 }
 
-export const AuctionCard: React.FC<AuctionCardProps> = ({ line }) => {
+export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
 
     const getImg = useParallelAuctionState(state => state.getImage)
     const updateLine = useParallelAuctionState(state => state.updateLine)
-    const setLine = useParallelAuctionState(state => state.setCurrentSelectedLine)
+    const setCurrentSelectedLine = useParallelAuctionState(state => state.setCurrentSelectedIndex)
+    const line = useParallelAuctionState(state => state.getLine)(lineIndex)
 
     const imageUrl = pipe(
         line,
@@ -35,8 +35,8 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ line }) => {
     )
 
     const onCardClick = async () => {
-        const newLine = await updateLine(line)
-        setLine(newLine)
+        const newLine = await updateLine(lineIndex)
+        setCurrentSelectedLine(lineIndex)
     }
 
 	return (

@@ -62,7 +62,11 @@ dialog[open] {
     transition: all 0.25s;
 }
 
-#cancel-modal, #confirm-modal {
+#connect-wallet {
+    width: 100%;
+}
+
+#cancel-modal, #confirm-modal, #connect-wallet {
     margin-top: 10px;
 	height: var(--sp-4);
 	border-style: none;
@@ -73,11 +77,11 @@ dialog[open] {
 	color: var(--clr-accent-heavy);
 	box-shadow: var(--ev-neu-inner-action);
 	cursor: pointer;
-	transition: 150ms;
 }
 
-#cancel-modal:hover, #confirm-modal:hover {
+#cancel-modal:hover, #confirm-modal:hover, #connect-wallet:hover {
 	border: 1px solid var(--clr-accent);
+    transition: 250ms;
 }
 
 #confirm-modal {

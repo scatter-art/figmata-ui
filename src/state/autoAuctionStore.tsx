@@ -44,18 +44,35 @@ type ParallelAuctionStoreState = {
      */
     auctionData: O.Option<ParallelAuctionData>,
     
-    currentSelectedLine: O.Option<LineStateStruct>,
+    currentLineIndex: number,
 
     lines: O.Option<O.Option<LineStateStruct>[]>,
     
-    setCurrentSelectedLine: (line: O.Option<LineStateStruct>) => void,
+    /* ------------- LINE MANIPULATION FUNCTIONS ------------- */
 
+    /**
+     * @returns Some line at `lines[index]`.
+     * None iff `index` is not valid.
+     */
+    getLine: (index: number) => O.Option<LineStateStruct>,
+
+    /**
+     * @returns The selected line based on `currentLineIndex`.
+     */
+    getCurrentSelectedLine: () => O.Option<LineStateStruct>,
+    
+    /**
+     * @dev Sets `currentLineIndex := index` iff `index` is a valid index.
+     */
+    setCurrentSelectedIndex: (index: number) => void,
+    
+    // TODO refactor so it gets an index.
     /**
      * @dev Updates in `lines` the inputed `line`.
      * @returns A new updated line.
      */
-    updateLine: (line: O.Option<LineStateStruct>) => Promise<O.Option<LineStateStruct>>,
-
+    updateLine: (lineIndexToUpdate: number) => Promise<O.Option<LineStateStruct>>,
+    
     setAuctionData: (
         auctionAddress: string[42], 
         auctionedTokenName: string, 
@@ -75,31 +92,40 @@ type ParallelAuctionStoreState = {
     getCurrentTokenName: () => O.Option<string>,
 
     getAuctionConfig: () => O.Option<AuctionConfigStruct>,
-
+    
     createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
     
     /**
-     * @dev It will set an event so the lines gets automatically
+     * @dev It will set an event so the lines get automatically
      * updated after the auction time ends.
      */
-    _setLinesTimers: (lines: O.Option<O.Option<LineStateStruct>[]>) => void,
+    _setLinesTimers: () => void,
     
     /**
      * @dev It will set an event so `lineOpt` gets automatically
      * updated after its auction time ends.
      */
-    _setLineTimer: (lineOpt: O.Option<LineStateStruct>) => void
+    _setLineTimer: (lineIndex: number) => void
 
 }
 
 export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, get) => {return {
 
     auctionData: O.none,
-    currentSelectedLine: O.none,
+    currentLineIndex: 0,
     lines: O.none,
-    
-    setCurrentSelectedLine: (line: O.Option<LineStateStruct>) => 
-        set({ currentSelectedLine: line }),
+
+    getLine: (index: number) => pipe(
+        get().lines,
+        O.flatMap(lines => lines[index])
+    ),
+
+    getCurrentSelectedLine: () => get().getLine(get().currentLineIndex),
+
+    setCurrentSelectedIndex: (index: number) => {
+        if (O.isSome(get().getLine(index))) set({ currentLineIndex: index })
+    },
+
 
     setAuctionData: async (
         auctionAddress: string[42], 
@@ -176,15 +202,8 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             )),
         )()
         
-        get()._setLinesTimers(lineOpts)
         set({ lines: lineOpts })
-        
-        const defaultLine = pipe(
-            lineOpts,
-            O.flatMap(lines => lines[0])
-        )
-
-        set({ currentSelectedLine: defaultLine })
+        get()._setLinesTimers()
 
     },
     
@@ -202,8 +221,11 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
     
         set({ auctionData: O.of({...data, auctionContract, auctionedToken }) })
     },
+    
+    updateLine: async (lineIndexToUpdate: number) => {
 
-    updateLine: async (lineToUpdate: O.Option<LineStateStruct>) => {
+        const lineToUpdate = get().getLine(lineIndexToUpdate)
+
         const newLine = await pipe(
             O.Do,
             O.bind('lineToUpdate', () => lineToUpdate),
@@ -214,7 +236,6 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             )),
         )()
 
-        get()._setLineTimer(newLine)
     
         const allLines = get().lines
         
@@ -238,7 +259,11 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             })
         )
         
-        if (O.isSome(updatedLines)) set({ lines: updatedLines })
+        if (O.isSome(updatedLines)) {
+            set({ lines: updatedLines })
+            get()._setLineTimer(lineIndexToUpdate)
+        }
+
         return newLine
     },
     
@@ -259,14 +284,13 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
     getCurrentTokenName: () => pipe(
         O.Do,
         O.bind('name', get().getCollectionName),
-        O.bind('line', () => get().currentSelectedLine),
+        O.bind('line', get().getCurrentSelectedLine),
         O.map(({ name, line }) => `${name} #${line.head}`)
     ),
 
     getAuctionConfig: () => pipe(
         get().auctionData,
-        O.map(data => data.auctionConfig),
-        O.map(x => x)
+        O.map(data => data.auctionConfig)
     ),
     
     // TODO This solution is ugly af, can't I use the user wallet for
@@ -276,7 +300,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.bind('signer', () => useUserStore.getState().userSigner),
         O.bind('data', () => get().auctionData),
         O.bind('auction', ({ data }) => O.of(data.auctionContract)),
-        O.bind('line', () => get().currentSelectedLine),
+        O.bind('line', get().getCurrentSelectedLine),
         TO.fromOption,
         TO.flatMap(({ auction, line, signer }) => TO.tryCatch(() => 
             (auction.connect(signer) as typeof auction)
@@ -284,14 +308,18 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         ))
     )(),
         
-    _setLinesTimers: pipe(
-        O.map(pipe(A.map(lineOpt => get()._setLineTimer(lineOpt))))
+    _setLinesTimers: () => pipe(
+        get().lines,
+        O.map(A.mapWithIndex((i,_) => get()._setLineTimer(i)))
     ),
     
-    _setLineTimer: pipe(O.map(line => setTimeout(
-        async () => await get().updateLine(O.some(line)),
-        msTimeLeft(ethers.toNumber(line.endTime))
-    )))
+    _setLineTimer: (lineIndex: number) => pipe(
+        get().getLine(lineIndex),
+        O.map(line => setTimeout(
+            async () => await get().updateLine(lineIndex),
+            msTimeLeft(ethers.toNumber(line.endTime))
+        ))
+    )
 
 }})
 

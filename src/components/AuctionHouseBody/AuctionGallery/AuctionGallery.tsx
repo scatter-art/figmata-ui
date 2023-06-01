@@ -16,7 +16,7 @@ export const AuctionGallery = () => {
 
 	return (
 		<div id={style['auction-container']}>
-            {lines.map((line, i) => <AuctionCard line={line} key={i} /> )}
+            {lines.map((_,i) => <AuctionCard lineIndex={i} key={i} /> )}
 		</div>
 	)
 }

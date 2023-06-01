@@ -7,6 +7,7 @@ import { AuctionConfigStruct, LineStateStruct } from "../../../types/IHoldsParal
 import { fromWei } from "../../../utils/web3";
 import { ethers } from "ethers";
 import { PROVIDER_DOWN_MESSAGE } from "../SidePanel";
+import { useUserStore } from "../../../state/userStore";
 
 const calcMinPriceForLine = (
     line: O.Option<LineStateStruct>,
@@ -32,12 +33,17 @@ const calcMinPriceForLine = (
 
 export const PlaceBidButton = () => {
     
-    const line = useParallelAuctionState(state => state.currentSelectedLine)
-    const config = useParallelAuctionState(state => state.getAuctionConfig)()
-    const createBid = useParallelAuctionState(state => state.createBid)
+    const line = useParallelAuctionState(state => state.getCurrentSelectedLine)()
+    const lineIndex = useParallelAuctionState(state => state.currentLineIndex)
 
     const updateLine = useParallelAuctionState(state => state.updateLine)
-    const setNewLine = useParallelAuctionState(state => state.setCurrentSelectedLine)
+    const setCurrentSelectedIndex = useParallelAuctionState(state => state.setCurrentSelectedIndex)
+
+    const config = useParallelAuctionState(state => state.getAuctionConfig)()
+    const createBid = useParallelAuctionState(state => state.createBid)
+    
+    const userConnected = useUserStore(state => state.userConnected)
+    const connection = useUserStore(state => state.connectUser)
 
     const minPrice = calcMinPriceForLine(line, config)
 
@@ -72,9 +78,13 @@ export const PlaceBidButton = () => {
         const tx = await createBid(inputValue)
         if (O.isNone(tx)) return // TODO Handle signature failed
         const receipt = await tx.value.wait()
-        const newLine = await updateLine(line) 
-        setNewLine(newLine)
+        const newLine = await updateLine(lineIndex)
+        setCurrentSelectedIndex(lineIndex)
         handleModalClosing()
+    }
+
+    const handleModalWalletConnection = () => {
+        if (!userConnected) connection()
     }
     
     // TODO Handle wallet not connected.
@@ -96,12 +106,20 @@ export const PlaceBidButton = () => {
                 value={inputValue}
             />
             <div>
+            {userConnected ? 
+                <>
                 <button id={style['confirm-modal']} onClick={handleBidConfirmation}>
                     Confirm
                 </button>
                 <button id={style['cancel-modal']} onClick={handleModalClosing}>
                     Cancel
                 </button>
+                </>
+            :
+                <button id={style['connect-wallet']} onClick={handleModalWalletConnection}>
+                    Connect Wallet
+                </button>
+            }
             </div>
         </dialog>
         </>

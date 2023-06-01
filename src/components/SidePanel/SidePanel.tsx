@@ -13,10 +13,12 @@ export const PROVIDER_DOWN_MESSAGE = () => 'Scatter is down, connect wallet :('
 
 export const SidePanel: React.FC = () => {
     
-
     const getName = useParallelAuctionState(state => state.getCurrentTokenName)
-    const line = useParallelAuctionState(state => state.currentSelectedLine)
+    const line = useParallelAuctionState(state => state.getCurrentSelectedLine)()
     const getImg = useParallelAuctionState(state => state.getImage)
+
+    // Selected line subscription so the state gets updated on its change.
+    useParallelAuctionState(state => state.currentLineIndex)
     
     const tokenName = pipe(
         getName(),
