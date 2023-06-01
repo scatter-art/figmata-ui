@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParallelAuctionState } from "../../../state/autoAuctionStore";
 import style from './PlaceBidButton.module.css'
 import * as O from 'fp-ts/Option'
@@ -7,7 +7,6 @@ import { AuctionConfigStruct, LineStateStruct } from "../../../types/IHoldsParal
 import { fromWei } from "../../../utils/web3";
 import { ethers } from "ethers";
 import { PROVIDER_DOWN_MESSAGE } from "../SidePanel";
-import { useUserStore } from "../../../state/userStore";
 
 const calcMinPriceForLine = (
     line: O.Option<LineStateStruct>,
@@ -31,8 +30,6 @@ const calcMinPriceForLine = (
     )
 }
 
-// TODO lineState shouldn't be passed as arg, it should be decoupled
-// to the contract store.
 export const PlaceBidButton = () => {
     
     const line = useParallelAuctionState(state => state.currentSelectedLine)
@@ -41,8 +38,6 @@ export const PlaceBidButton = () => {
 
     const updateLine = useParallelAuctionState(state => state.updateLine)
     const setNewLine = useParallelAuctionState(state => state.setCurrentSelectedLine)
-    // FIXME
-    const userProv = useUserStore(state => state.userProvider)
 
     const minPrice = calcMinPriceForLine(line, config)
 
@@ -77,7 +72,6 @@ export const PlaceBidButton = () => {
         const tx = await createBid(inputValue)
         if (O.isNone(tx)) return // TODO Handle signature failed
         const receipt = await tx.value.wait()
-        console.log(receipt)
         const newLine = await updateLine(line) 
         setNewLine(newLine)
         handleModalClosing()

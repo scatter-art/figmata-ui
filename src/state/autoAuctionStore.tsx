@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import * as O from 'fp-ts/Option'
 import * as TO from 'fp-ts/TaskOption'
 import * as A from 'fp-ts/Array'
-import { pipe } from 'fp-ts/lib/function'
+import {pipe } from 'fp-ts/lib/function'
 
 import { 
     IExternallyMintable,
@@ -13,7 +13,7 @@ import {
 } from '../types'
 
 import { useUserStore } from './userStore'
-import { TO2 } from '../utils/pure'
+import { msTimeLeft, TO2 } from '../utils/pure'
 import { AuctionConfigStruct, LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 import { toWei } from '../utils/web3'
 
@@ -76,7 +76,19 @@ type ParallelAuctionStoreState = {
 
     getAuctionConfig: () => O.Option<AuctionConfigStruct>,
 
-    createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>
+    createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
+    
+    /**
+     * @dev It will set an event so the lines gets automatically
+     * updated after the auction time ends.
+     */
+    _setLinesTimers: (lines: O.Option<O.Option<LineStateStruct>[]>) => void,
+    
+    /**
+     * @dev It will set an event so `lineOpt` gets automatically
+     * updated after its auction time ends.
+     */
+    _setLineTimer: (lineOpt: O.Option<LineStateStruct>) => void
 
 }
 
@@ -164,6 +176,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             )),
         )()
         
+        get()._setLinesTimers(lineOpts)
         set({ lines: lineOpts })
         
         const defaultLine = pipe(
@@ -174,7 +187,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         set({ currentSelectedLine: defaultLine })
 
     },
-
+    
     updateContractsProvider: () => {
         const userProviderOpt = useUserStore.getState().userProvider
         const auctionDataOpt = get().auctionData
@@ -200,12 +213,19 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
                 () => auctionData.auctionContract.lineState(Number(lineToUpdate.head))
             )),
         )()
+
+        get()._setLineTimer(newLine)
     
         const allLines = get().lines
         
+        // NOTE Index could be out of bounds.
         const indexToMutate = pipe(
-            allLines,
-            O.map(lines => lines.indexOf(lineToUpdate))
+            O.Do,
+            O.bind('allLines', () => allLines),
+            O.bind('lineToUpdate', () => lineToUpdate),
+            O.map(({ allLines, lineToUpdate }) => allLines.findIndex(pipe(
+                O.exists(line => line.head === lineToUpdate.head),
+            ))),
         )
 
         const updatedLines = pipe(
@@ -213,12 +233,12 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             O.bind('i', () => indexToMutate),
             O.bind('allLines', () => allLines),
             O.map(({ i, allLines }) => {
-                if (O.isSome(allLines[i])) allLines[i] = newLine
+                if (allLines[i] !== undefined) allLines[i] = newLine
                 return allLines
             })
         )
         
-        set({ lines: updatedLines })
+        if (O.isSome(updatedLines)) set({ lines: updatedLines })
         return newLine
     },
     
@@ -262,8 +282,16 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             (auction.connect(signer) as typeof auction)
                 .createBid(line.head, { value: toWei(value)})
         ))
-    )()
-
+    )(),
+        
+    _setLinesTimers: pipe(
+        O.map(pipe(A.map(lineOpt => get()._setLineTimer(lineOpt))))
+    ),
+    
+    _setLineTimer: pipe(O.map(line => setTimeout(
+        async () => await get().updateLine(O.some(line)),
+        msTimeLeft(ethers.toNumber(line.endTime))
+    )))
 
 }})
 

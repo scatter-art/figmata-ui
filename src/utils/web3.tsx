@@ -1,6 +1,8 @@
+import * as A from 'fp-ts/Array'
 import * as O from 'fp-ts/Option'
 import { BigNumberish, ethers } from "ethers"
 import { pipe } from 'fp-ts/lib/function'
+import { LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 
 export const formatAddr = (
     addr: string[42], digitsToShow: number = 6
@@ -32,5 +34,4 @@ export const formatOptAddr = (
 
 export const fromWei = (x: BigNumberish | bigint) => ethers.formatUnits(x, 'ether')
 export const toWei = (x: number) => ethers.parseEther(x.toString())
-
 

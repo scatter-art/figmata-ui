@@ -3,6 +3,7 @@ import * as E from "fp-ts/lib/Either";
 import * as TO from 'fp-ts/TaskOption'
 import * as TE from 'fp-ts/TaskEither'
 import { identity, pipe } from "fp-ts/lib/function";
+import { BigNumberish, ethers } from "ethers";
 
 /**
  * @dev This function will unwrap a `TO.TaskOption` and try to run
@@ -63,7 +64,15 @@ export const formattedTimeLeft = (unixTimestamp: number): O.Option<string> => {
     const fsecs = secs < 10 ? `0${secs.toString()}` : secs.toString()
 
     return O.of(`${hours}:${fmins}:${fsecs}`)
-};
+}
+
+/**
+ * @returns Time left until `unixTimestamp` in ms.
+ */
+export const msTimeLeft = (unixTimestamp: number): number => {
+    const diff = Math.floor(unixTimestamp - Date.now() / 1000)
+    return diff * 1000
+}
 
 
 /**
