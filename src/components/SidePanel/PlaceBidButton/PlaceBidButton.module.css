@@ -96,6 +96,7 @@ dialog[open] {
 }
 
 #bid-input {
+    margin-top: 10px;
     border: 2px solid;
     border-color: var(--clr-surface);
     border-radius: 10px;
@@ -109,4 +110,8 @@ dialog[open] {
     outline: none;
     border-radius: 100px;
     padding: 4px 10px;
+}
+
+dialog > div > span, dialog > h1 {
+    color: var(--clr-accent-heavy);
 }

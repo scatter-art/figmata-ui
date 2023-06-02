@@ -31,6 +31,7 @@ const calcMinPriceForLine = (
     )
 }
 
+// TODO ??? Fix this the state is all over the place.
 export const PlaceBidButton = () => {
     
     const line = useParallelAuctionState(state => state.getCurrentSelectedLine)()
@@ -47,6 +48,8 @@ export const PlaceBidButton = () => {
     const connection = useUserStore(state => state.connectUser)
 
     const minPrice = calcMinPriceForLine(line, config)
+
+    const currentBid = useParallelAuctionState(s => s.getFormattedCurrentBid)(lineIndex)
 
     const [inputValue, setInputValue] = useState<number>(0)
 
@@ -92,15 +95,18 @@ export const PlaceBidButton = () => {
         if (!userConnected) connection()
     }
     
-    // TODO Handle wallet not connected.
-    return (
-        <>
+    return <>
         <div id={style['place-bid-button-container']} onClick={handleModalOppening}>
             <div id={style['place-bid-button']}>
                 <span>PLACE YOUR BID</span>
             </div>
         </div>
         <dialog id='bidModal'>
+            <h1>Place Bid</h1>
+            <div>
+                <span>Current bid: </span>
+                <span>{currentBid}</span>
+            </div>
             <input
                 id={style['bid-input']}
                 type='number'
@@ -127,6 +133,5 @@ export const PlaceBidButton = () => {
             }
             </div>
         </dialog>
-        </>
-    )
+    </>
 }

@@ -13,7 +13,7 @@ export const SidePanel: React.FC = () => {
     const lineIndex = useParallelAuctionState(state => state.currentLineIndex)
     sidePanelObserver(s => s.observer)
 
-    const tokenName = useParallelAuctionState(s => s.getFormattedCurrentWinner)(lineIndex)
+    const tokenName = useParallelAuctionState(s => s.getFormattedTokenName)(lineIndex)
     const currentBid = useParallelAuctionState(s => s.getFormattedCurrentBid)(lineIndex)
     const endTime = useParallelAuctionState(s => s.getEndTime)(lineIndex)
     const imageUrl = useParallelAuctionState(s => s.getImage)(lineIndex)
