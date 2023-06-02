@@ -1,4 +1,4 @@
-import { ethers, Signer } from 'ethers'
+import { ethers } from 'ethers'
 import { create } from 'zustand'
 
 import * as O from 'fp-ts/Option'
@@ -15,7 +15,7 @@ import {
 import { useUserStore } from './userStore'
 import { msTimeLeft, TO2 } from '../utils/pure'
 import { AuctionConfigStruct, LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
-import { toWei } from '../utils/web3'
+import { formatAddr, fromWei, toWei } from '../utils/web3'
 
 
 type ParallelAuctionData = {
@@ -27,6 +27,8 @@ type ParallelAuctionData = {
     readonly tokenName: string,
     readonly tokenImagesUri: string
 }
+
+export const PROVIDER_DOWN_MESSAGE = () => 'Scatter is down, connect wallet :('
 
 /**
  * @dev This store provides differente secure abstractions to interact
@@ -88,17 +90,23 @@ type ParallelAuctionStoreState = {
     
     /* ------------- GENERAL CONTRACT QUERIES ------------- */
 
-    getImage: (tokenId: O.Option<number>) => string,
+    getImage: (forLineIndex: number) => string,
 
     getCollectionName: () => O.Option<string>,
 
-    getCurrentTokenName: () => O.Option<string>,
+    getFormattedTokenName: (forLineIndex: number) => string,
 
     getAuctionConfig: () => O.Option<AuctionConfigStruct>,
     
-    createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
-    
+    getEndTime: (forLineIndex: number) => O.Option<number>,
 
+    getFormattedCurrentBid: (forLineIndex: number) => string,
+
+    getFormattedCurrentWinner: (forLineIndex: number) => string,
+
+    createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
+
+    
     /* --------------- HELPER FUNCTIONS --------------- */
     /**
      * @dev It will set an event so the lines get automatically
@@ -272,12 +280,11 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         return newLine
     },
     
-    getImage: (tokenId: O.Option<number>) => pipe( 
+    getImage: (forLineIndex: number) => pipe(
         O.Do,
-        O.bind('id', () => tokenId),
-        O.bind('data', () => get().auctionData),
-        O.bind('uri', ({ data }) => O.of(data.tokenImagesUri)),
-        O.map(({ id, uri })=> `${uri}/${id}.png`),
+        O.bind('line', () => get().getLine(forLineIndex)),
+        O.bind('uri', () => pipe(get().auctionData, O.map(d => d.tokenImagesUri))),
+        O.map(({ line, uri }) => `${uri}/${line.head}.png`),
         O.getOrElse(() => '/404.png')
     ),
     
@@ -286,16 +293,34 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.map(data => data.tokenName)
     ),
 
-    getCurrentTokenName: () => pipe(
+    getFormattedTokenName: (forLineIndex: number) => pipe(
         O.Do,
         O.bind('name', get().getCollectionName),
-        O.bind('line', get().getCurrentSelectedLine),
-        O.map(({ name, line }) => `${name} #${line.head}`)
+        O.bind('line', () => get().getLine(forLineIndex)),
+        O.map(({ name, line }) => `${name} #${line.head}`),
+        O.getOrElse(PROVIDER_DOWN_MESSAGE)
     ),
 
     getAuctionConfig: () => pipe(
         get().auctionData,
         O.map(data => data.auctionConfig)
+    ),
+
+    getEndTime: (forLineIndex: number) => pipe(
+        get().getLine(forLineIndex),
+        O.flatMap(line => O.tryCatch(() => Number(line.endTime)))
+    ),
+
+    getFormattedCurrentBid: (forLineIndex: number) => pipe(
+        get().getLine(forLineIndex),
+        O.map(line => `Ξ${fromWei(line.currentPrice)}`),
+        O.getOrElse(PROVIDER_DOWN_MESSAGE)
+    ),
+
+    getFormattedCurrentWinner: (forLineIndex: number) => pipe(
+        get().getLine(forLineIndex),
+        O.flatMap(line => formatAddr(line.currentWinner.toString(), 11)),
+        O.getOrElse(PROVIDER_DOWN_MESSAGE)
     ),
     
     // TODO This solution is ugly af, can't I use the user wallet for

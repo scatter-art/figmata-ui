@@ -12,16 +12,11 @@ interface AuctionCardProps {
 
 export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
 
-    const getImg = useParallelAuctionState(state => state.getImage)
     const updateLine = useParallelAuctionState(state => state.updateLine)
     const setCurrentSelectedLine = useParallelAuctionState(state => state.setCurrentSelectedIndex)
     const line = useParallelAuctionState(state => state.getLine)(lineIndex)
 
-    const imageUrl = pipe(
-        line,
-        O.map(line => getImg(O.of(Number(line.head)))),
-        O.getOrElse(() => getImg(O.none))
-    )
+    const imageUrl = useParallelAuctionState(s => s.getImage)(lineIndex)
 
     const currentBid = pipe(
         line,
