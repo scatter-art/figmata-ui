@@ -22,4 +22,6 @@ const mkObserver = () => create<ObserverStoreState>(set => ({
  * @dev This observer will be used to notify a state change request
  * over a `SidePanel.tsx`.
  */
-export const sidePanelObserver = mkObserver()
+export const hideSidePanelObserver = mkObserver()
+export const showSidePanelObserver = mkObserver()
+export const reRenderSidePanelObserver = mkObserver()

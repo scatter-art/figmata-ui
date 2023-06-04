@@ -74,6 +74,8 @@ export const msTimeLeft = (unixTimestamp: number): number => {
     return diff * 1000
 }
 
+export const sleep = (s: number) => 
+    new Promise(resolve => setTimeout(resolve, s*1000));
 
 /**
  * @returns A new object map where all `O.Option<U>` is transformed

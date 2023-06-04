@@ -7,7 +7,7 @@ import { AuctionConfigStruct, LineStateStruct } from "../../../types/IHoldsParal
 import { fromWei } from "../../../utils/web3";
 import { ethers } from "ethers";
 import { useUserStore } from "../../../state/userStore";
-import { sidePanelObserver } from "../../../state/observerStore";
+import { reRenderSidePanelObserver } from "../../../state/observerStore";
 
 const calcMinPriceForLine = (
     line: O.Option<LineStateStruct>,
@@ -36,7 +36,7 @@ export const PlaceBidButton = () => {
     
     const line = useParallelAuctionState(state => state.getCurrentSelectedLine)()
     const lineIndex = useParallelAuctionState(state => state.currentLineIndex)
-    const sidePanelNotifier = sidePanelObserver(s => s.notifyObservers)
+    const reRenderSidePanel = reRenderSidePanelObserver(s => s.notifyObservers)
 
     const updateLine = useParallelAuctionState(state => state.updateLine)
     const setCurrentSelectedIndex = useParallelAuctionState(state => state.setCurrentSelectedIndex)
@@ -72,14 +72,14 @@ export const PlaceBidButton = () => {
         getModal(),
         O.map(modal => modal.showModal()),
         O.map(() => updateLine(lineIndex)),
-        O.map(sidePanelNotifier)
+        O.map(reRenderSidePanel)
     )
 
     const handleModalClosing = () => pipe(
         getModal(),
         O.map(modal => modal.close()),
         O.map(() => updateLine(lineIndex)),
-        O.map(sidePanelNotifier)
+        O.map(reRenderSidePanel)
     )
 
     const handleBidConfirmation = async () => {

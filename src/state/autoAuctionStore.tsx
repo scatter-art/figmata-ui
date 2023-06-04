@@ -16,7 +16,7 @@ import { useUserStore } from './userStore'
 import { msTimeLeft, TO2 } from '../utils/pure'
 import { AuctionConfigStruct, LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 import { formatAddr, fromWei, toWei } from '../utils/web3'
-import { sidePanelObserver } from './observerStore'
+import { reRenderSidePanelObserver } from './observerStore'
 
 
 type ParallelAuctionData = {
@@ -350,7 +350,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             async () => {
                 await get().updateLine(lineIndex)
                 if (lineIndex === get().currentLineIndex)
-                    sidePanelObserver.getState().notifyObservers()
+                    reRenderSidePanelObserver.getState().notifyObservers()
             },
             msTimeLeft(ethers.toNumber(line.endTime))
         ))
