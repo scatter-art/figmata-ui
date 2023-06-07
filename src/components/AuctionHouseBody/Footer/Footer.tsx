@@ -16,8 +16,10 @@ export const Footer = () => {
 				</button>
 			</div>
 
-			<div>
-                Powered by Scatter
+			<div id={style['scatter-brand-container']}>
+				<a href="https://www.scatter.art/" target="_blank" rel="noopener noreferrer">
+					Powered by Scatter
+				</a>
 			</div>
 
 			<div id={style['social-button-container']}>
