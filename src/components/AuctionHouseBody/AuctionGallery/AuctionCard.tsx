@@ -28,7 +28,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
         O.map(line => `Ξ${fromWei(line.currentPrice)}`),
         O.getOrElse(() => '')
     )
-    
+
     const endTime = pipe(
         line,
         O.map(line => Number(line.endTime)),
@@ -44,23 +44,23 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
         showSidePanel()
     }
 
-	return (
-		<div className={style['auction-card']} onClick={onCardClick}>
-			<div className={style['thumbnail-container']}>
-				<div 
+    return (
+        <div className={style['auction-card']} onClick={onCardClick}>
+            <div className={style['thumbnail-container']}>
+                <div
                     className={style['thumbnail']}
-                    style={{ backgroundImage: `url(${imageUrl})`}}
+                    style={{ backgroundImage: `url(${imageUrl})` }}
                 ></div>
-			</div>
-			<div className={style['details']}>
-				<span>{currentBid}</span>
-				<span> {O.isSome(endTime) ? 
+            </div>
+            <div className={style['details']}>
+                <span>{currentBid}</span>
+                <span> {O.isSome(endTime) ?
                     <Countdown endTimestamp={endTime.value} /> : ''
                 } </span>
-			</div>
-			<button className={style['action']}>
+            </div>
+            <button className={style['action']}>
                 {O.isSome(endTime) ? 'PLACE BID' : '404 :('}
             </button>
-		</div>
-	)
+        </div>
+    )
 }

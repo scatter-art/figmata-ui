@@ -27,7 +27,7 @@ export const SidePanel: React.FC = () => {
 
 	useEffect(() => {
 		if (!sidePanelRef.current) return
-		sidePanelRef.current!.style.transform = 'translateX(var(--panel-w))'
+		sidePanelRef.current!.style.transform = 'translateX(100%)'
 	}, [onChangeHidePanel])
 
 	useEffect(() => {

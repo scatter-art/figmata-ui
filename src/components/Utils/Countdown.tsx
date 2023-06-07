@@ -6,7 +6,7 @@ import { formattedTimeLeft } from "../../utils/pure";
 export const Countdown: React.FC<{
     endTimestamp: number,
     timerFinishedText?: string
-}> = ({ endTimestamp, timerFinishedText = 'Finished!'}) => {
+}> = ({ endTimestamp, timerFinishedText = 'Finished'}) => {
     
     const [
         timeLeft, setTimeLeft

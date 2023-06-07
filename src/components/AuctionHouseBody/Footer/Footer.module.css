@@ -88,3 +88,9 @@
 #social-button-container > *:hover {
 	transform: scale(1.125);
 }
+
+/* AUDIO STYLE ---------------------- */
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+    display: none;
+}

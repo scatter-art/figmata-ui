@@ -16,6 +16,10 @@ export const Footer = () => {
 				</button>
 			</div>
 
+			<div>
+                Powered by Scatter
+			</div>
+
 			<div id={style['social-button-container']}>
 				<a href="/" target="_blank" rel="noopener noreferrer">
 					<svg width="22" height="22" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">

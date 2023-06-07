@@ -27,7 +27,7 @@ const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<A
 	return pipe(newPrice, O.map(fromWei), O.getOrElse(PROVIDER_DOWN_MESSAGE))
 }
 
-// TODO ??? Fix this the state is all over the place.
+// TODO ??? Fix this, the state is all over the place.
 export const PlaceBidButton = () => {
 	const line = useParallelAuctionState((state) => state.getCurrentSelectedLine)()
 	const lineIndex = useParallelAuctionState((state) => state.currentLineIndex)
