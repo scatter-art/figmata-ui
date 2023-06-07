@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Tue, 30 May 2023 04:31:37 GMT
+ * Generated on Wed, 07 Jun 2023 03:44:20 GMT
  */
 
 :root {
@@ -72,6 +72,9 @@
   --clr-ev-highlight-secondary-surface: rgba(63, 157, 131, 0.9);
   --clr-ev-cast-x-secondary-surface: rgba(11, 82, 60, 0.9);
   --clr-ev-cast-secondary-surface: rgba(39, 97, 71, 0.9);
+  --clr-ev-occlusion-bg: rgba(195, 204, 210, 0.2);
+  --clr-ev-highlight-bg: rgba(229, 240, 245, 0.9);
+  --clr-ev-cast-bg: rgba(195, 204, 210, 0.9);
   --clr-ev-occlusion-s: rgba(217, 221, 224, 0.2);
   --clr-ev-occlusion-m: rgba(217, 221, 224, 0.5);
   --clr-ev-occlusion: rgba(217, 221, 224, 0.9);
@@ -95,7 +98,9 @@
   --clr-accent-secondary-heavy: #8A7606;
   --clr-accent-secondary: #F3D842;
   --clr-accent-heavy: #E16AB6;
+  --clr-accent-light: #FFDDF3;
   --clr-accent: #F198D1;
+  --ev-neu-1-bg: 3px 3px 8px var(--clr-ev-cast-bg), -3px -3px 6px var(--clr-ev-highlight-bg), 3px -3px 6px var(--clr-ev-occlusion-bg), -3px 3px 6px var(--clr-ev-occlusion-bg);
   --ev-neu-1-accent-tertiary: 4px 4px 10px var(--clr-ev-cast-accent-tertiary), -4px -4px 8px var(--clr-ev-highlight-accent-tertiary), 4px -4px 8px var(--clr-ev-occlusion-accent-tertiary), -4px 4px 8px var(--clr-ev-occlusion-accent-tertiary);
   --ev-neu-1-hover-accent-secondary: 6px 6px 16px var(--clr-ev-cast-accent-secondary), -6px -6px 12px var(--clr-ev-highlight-accent-secondary), 6px -6px 12px var(--clr-ev-occlusion-accent-secondary), -6px 6px 12px var(--clr-ev-occlusion-accent-secondary), inset -2px -2px 4px var(--clr-ev-cast-s-accent-secondary), 2px 2px 4px var(--clr-ev-highlight-s-accent-secondary);
   --ev-neu-1-accent-secondary: 3px 3px 8px var(--clr-ev-cast-accent-secondary), -3px -3px 6px var(--clr-ev-highlight-accent-secondary), 3px -3px 6px var(--clr-ev-occlusion-accent-secondary), -3px 3px 6px var(--clr-ev-occlusion-accent-secondary), inset -1px -1px 2px var(--clr-ev-cast-s-accent-secondary), 1px 1px 2px var(--clr-ev-highlight-s-accent-secondary);

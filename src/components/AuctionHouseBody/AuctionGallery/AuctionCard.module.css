@@ -73,6 +73,7 @@
 /* ACTION --------------------------------- */
 .action {
 	height: var(--sp-4);
+	max-height: var(--sp-4);
 	border-style: none;
 	border: 1px solid transparent;
 	border-radius: var(--sp-1);

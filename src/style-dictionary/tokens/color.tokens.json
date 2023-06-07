@@ -1,6 +1,7 @@
 {
 	"clr": {
 		"accent": { "value": "#F198D1" },
+		"accent-light": { "value": "#FFDDF3" },
 		"accent-heavy": { "value": "#E16AB6" },
 		"accent-secondary": { "value": "#F3D842" },
 		"accent-secondary-heavy": { "value": "#8A7606" },
@@ -24,6 +25,9 @@
 		"ev-occlusion": { "value": "rgba(217, 221, 224, 0.9)" },
 		"ev-occlusion-m": { "value": "rgba(217, 221, 224, 0.5)" },
 		"ev-occlusion-s": { "value": "rgba(217, 221, 224, 0.2)" },
+		"ev-cast-bg": { "value": "rgba(195, 204, 210, 0.9)" },
+		"ev-highlight-bg": { "value": "rgba(229, 240, 245, 0.9)" },
+		"ev-occlusion-bg": { "value": "rgba(195, 204, 210, 0.2)" },
 		"ev-cast-secondary-surface": { "value": "rgba(39, 97, 71, 0.9)" },
 		"ev-cast-x-secondary-surface": { "value": "rgba(11, 82, 60, 0.9)" },
 		"ev-highlight-secondary-surface": { "value": "rgba(63, 157, 131, 0.9)" },

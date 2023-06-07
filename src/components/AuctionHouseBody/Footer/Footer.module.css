@@ -1,5 +1,6 @@
 /* HOST ----------------------------------- */
 #footer {
+	min-height: var(--sp-6);
 	height: var(--sp-6);
 	max-height: var(--sp-6);
 	padding: 0 var(--gap-o);
@@ -30,4 +31,60 @@
 	color: var(--clr-accent-tertiary-heavy);
 	box-shadow: var(--ev-neu-1-accent-tertiary);
 	cursor: pointer;
+}
+
+/* MUSIC BUTTON --------------------------- */
+#music-button-container {
+	padding: var(--sp-5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: var(--sp-12);
+	background-color: var(--clr-accent-tertiary);
+	transform: translateY(-17%);
+}
+
+@media screen and (max-width: 960px) {
+	#music-button-container {
+		display: none;
+	}
+}
+
+#music-button {
+	padding: var(--sp-1) var(--sp-2);
+	border-style: none;
+	border-radius: var(--sp-5);
+	background-color: var(--clr-accent-tertiary);
+	font-family: var(--font-pixel);
+	font-size: 1rem;
+	color: var(--clr-accent-tertiary-heavy);
+	box-shadow: var(--ev-neu-1-accent-tertiary);
+	cursor: pointer;
+}
+
+#music-button > * {
+	max-height: var(--sp-4);
+	max-width: calc(var(--sp-12) * 2);
+}
+
+/* SOCIALS BUTTONS ------------------------ */
+#social-button-container {
+	display: flex;
+	align-items: center;
+	gap: var(--gap-i);
+}
+
+#social-button-container > * {
+	width: var(--sp-4);
+	height: var(--sp-4);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: var(--sp-4);
+	box-shadow: var(--ev-neu-1-bg);
+	transition: 150ms;
+}
+
+#social-button-container > *:hover {
+	transform: scale(1.125);
 }
