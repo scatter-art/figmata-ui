@@ -35,6 +35,9 @@
 		},
 		"neu-1-accent-tertiary": {
 			"value": "4px 4px 10px {clr.ev-cast-accent-tertiary}, -4px -4px 8px {clr.ev-highlight-accent-tertiary}, 4px -4px 8px {clr.ev-occlusion-accent-tertiary}, -4px 4px 8px {clr.ev-occlusion-accent-tertiary}"
+		},
+		"neu-1-bg": {
+			"value": "3px 3px 8px {clr.ev-cast-bg}, -3px -3px 6px {clr.ev-highlight-bg}, 3px -3px 6px {clr.ev-occlusion-bg}, -3px 3px 6px {clr.ev-occlusion-bg}"
 		}
 	}
 }
