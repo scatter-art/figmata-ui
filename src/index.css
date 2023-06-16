@@ -75,6 +75,12 @@ code {
 	animation-timing-function: linear;
 }
 
+#motif-border:nth-of-type(2) {
+	right: 0;
+	left: auto;
+	transform: rotate(180deg);
+}
+
 @keyframes border-pan {
 	from {
 		background-position: 0 0;
@@ -101,4 +107,16 @@ main > .body {
 	border-radius: 0 var(--sp-2) var(--sp-2) 0;
 	background-color: var(--clr-bg);
 	box-shadow: var(--ev-neu-outer);
+}
+
+/* COUNTDOWN PAGE -------------------------- */
+#countdown-body {
+	max-width: 100vw;
+	margin: 5%;
+	flex-grow: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	gap: var(--gap-o);
 }
