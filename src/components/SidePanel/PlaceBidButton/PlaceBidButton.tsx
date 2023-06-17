@@ -8,7 +8,8 @@ import { fromWei } from '../../../utils/web3'
 import { ethers } from 'ethers'
 import { useUserStore } from '../../../state/userStore'
 import { reRenderSidePanelObserver } from '../../../state/observerStore'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
+
 
 const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<AuctionConfigStruct>): string => {
 	const newPrice = pipe(
@@ -57,27 +58,30 @@ export const PlaceBidButton = () => {
 		setInputValue(parseFloat(minPrice))
 	}, [minPrice])
 
-	const getModal = () =>
-		pipe(
-			O.fromNullable(document.getElementById('bidModal')),
-			O.flatMap((modal) => O.tryCatch(() => modal as HTMLDialogElement))
-		)
+	const getModal = () => pipe(
+        O.fromNullable(document.getElementById('bidModal')),
+        O.flatMap(modal => O.tryCatch(() => modal as HTMLDialogElement))
+	)
 
-	const handleModalOppening = () =>
+	const handleModalOppening = async () => {
 		pipe(
 			getModal(),
-			O.map((modal) => modal.showModal()),
-			O.map(() => updateLine(lineIndex)),
-			O.map(reRenderSidePanel)
+			O.map(modal => modal.showModal()),
 		)
+        
+        await updateLine(lineIndex)
+        reRenderSidePanel()
+    }
 
-	const handleModalClosing = () =>
+	const handleModalClosing = async () => {
 		pipe(
 			getModal(),
-			O.map((modal) => modal.close()),
-			O.map(() => updateLine(lineIndex)),
-			O.map(reRenderSidePanel)
-		)
+			O.map(modal => modal.close())
+        )
+
+        await updateLine(lineIndex)
+        reRenderSidePanel()
+    }
 
 	const handleBidConfirmation = async () => {
 		const toastAwaiting = toast.loading('Awaiting signature...')
@@ -88,7 +92,7 @@ export const PlaceBidButton = () => {
 
 		if (O.isNone(tx)) {
 			toast.error('Transaction error')
-			return // TODO Handle signature failed
+			return
 		}
 
 		const toastTxPending = toast.loading('Transaction pending...')

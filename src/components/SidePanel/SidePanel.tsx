@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { PROVIDER_DOWN_MESSAGE, useParallelAuctionState } from '../../state/autoAuctionStore'
 import { DappConnector } from './DappConnector/DappConnector'
 import * as O from 'fp-ts/Option'

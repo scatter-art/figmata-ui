@@ -4,6 +4,19 @@
   "sourceName": "contracts/interfaces/IParallelAutoAuction.sol",
   "abi": [
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint24",
+          "name": "tokenId",
+          "type": "uint24"
+        }
+      ],
+      "name": "Bid",
+      "type": "event"
+    },
+    {
       "inputs": [],
       "name": "auctionConfig",
       "outputs": [
