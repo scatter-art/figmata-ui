@@ -4,13 +4,15 @@ import { DappConnector } from './DappConnector/DappConnector'
 import * as O from 'fp-ts/Option'
 import style from './SidePanel.module.css'
 
-import { Countdown } from '../Utils/Countdown'
 import { PlaceBidButton } from './PlaceBidButton/PlaceBidButton'
 import { hideSidePanelObserver, reRenderSidePanelObserver, showSidePanelObserver } from '../../state/observerStore'
 import { sleep } from '../../utils/pure'
+import Countdown from 'react-countdown'
+import { defaultCountdownRenderer } from '../CountdownPageCounter/CountdownPageCounter'
 
 export const SidePanel: React.FC = () => {
-	const lineIndex = useParallelAuctionState((state) => state.currentLineIndex)
+
+	const lineIndex = useParallelAuctionState((s) => s.currentLineIndex)
 	const subscription = reRenderSidePanelObserver((s) => s.observer)
 
 	const tokenName = useParallelAuctionState((s) => s.getFormattedTokenName)(lineIndex)
@@ -69,7 +71,10 @@ export const SidePanel: React.FC = () => {
 					<div className={style['focus-token-auction-details-item']}>
 						<span>Ends in:</span>
 						<span>
-							{O.isSome(endTime) ? <Countdown endTimestamp={endTime.value} /> : PROVIDER_DOWN_MESSAGE()}
+							{O.isSome(endTime) ? 
+                                <Countdown date={endTime.value*1000} daysInHours/> :
+                                PROVIDER_DOWN_MESSAGE()
+                            }
 						</span>
 					</div>
 

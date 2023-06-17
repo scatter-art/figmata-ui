@@ -1,7 +1,7 @@
 import React from 'react'
 import { Header } from './Header/Header'
 import { Polaroid } from './Polaroid/Polaroid'
-import { Counter } from './Counter/Counter'
+import { CountdownPageCounter } from './CountdownPageCounter/CountdownPageCounter'
 
 export const CountDownPage: React.FC = () => {
 	return (
@@ -19,7 +19,7 @@ export const CountDownPage: React.FC = () => {
 					<Polaroid />
 					<Polaroid />
 
-					<Counter />
+					<CountdownPageCounter />
 				</div>
 			</main>
 		</>

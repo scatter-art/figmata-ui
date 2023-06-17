@@ -1,10 +1,15 @@
+import { boolean } from "fp-ts"
 import { create } from "zustand"
+import * as O from 'fp-ts/Option'
 
 type ObserverStoreState = {
     /**
      * @dev All observers will just subscribe to this state.
      */
-    observer: number,
+    observer: O.Option<{ 
+        firstTimeNotified: boolean,
+        counter: number 
+    }>,
 
     /**
      * @dev Observer notifiers will call this function to re-render all its
@@ -14,8 +19,25 @@ type ObserverStoreState = {
 }
 
 const mkObserver = () => create<ObserverStoreState>(set => ({
-    observer: 0,
-    notifyObservers: () => set(s => ({observer: s.observer + 1 }))
+
+    observer: O.none,
+
+    notifyObservers: () => set(s => {
+
+        if (O.isNone(s.observer)) 
+            return { observer: O.some({ 
+                firstTimeNotified: true,
+                counter: 1
+            })}
+
+        const currentCount = s.observer.value.counter
+        return { observer: O.some({
+            firstTimeNotified: false,
+            counter: currentCount + 1
+        })}
+
+    })
+
 }))
 
 /**
@@ -25,3 +47,4 @@ const mkObserver = () => create<ObserverStoreState>(set => ({
 export const hideSidePanelObserver = mkObserver()
 export const showSidePanelObserver = mkObserver()
 export const reRenderSidePanelObserver = mkObserver()
+export const pageSwapObserver = mkObserver()
