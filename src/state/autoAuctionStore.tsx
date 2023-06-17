@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import * as O from 'fp-ts/Option'
 import * as TO from 'fp-ts/TaskOption'
 import * as A from 'fp-ts/Array'
-import {pipe } from 'fp-ts/lib/function'
+import { constVoid, pipe } from 'fp-ts/lib/function'
 
 import { 
     IExternallyMintable,
@@ -120,6 +120,12 @@ type ParallelAuctionStoreState = {
      * updated after its auction time ends.
      */
     _setLineTimer: (lineIndex: number) => void
+    
+    /**
+     * @dev Event function that should only trigger if an event
+     * happens over `biddedId`.
+     */
+    _onBidEventDo: (biddedId: bigint) => void
 
 }
 
@@ -217,10 +223,17 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         )()
         
         set({ lines: lineOpts })
+        
+        // Finally, we specify all events that will manipulate `lines`.
+        pipe(
+            auctionContract,
+            O.map(c => c.addListener('Bid', get()._onBidEventDo))
+        )
+
         get()._setLinesTimers()
 
     },
-    
+
     updateContractsProvider: () => {
         const userProviderOpt = useUserStore.getState().userProvider
         const auctionDataOpt = get().auctionData
@@ -354,7 +367,18 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             },
             msTimeLeft(ethers.toNumber(line.endTime))
         ))
-    )
+    ),
+
+    _onBidEventDo: (biddedId: bigint) => pipe(
+        get().getAuctionConfig(),
+        O.map(auctionConfig => auctionConfig.lines),
+        O.map(lines => (Number(biddedId) - 1) % Number(lines)),
+        O.map(lineIndex => get().updateLine(lineIndex).then(() => {
+            if (lineIndex === get().currentLineIndex)
+                reRenderSidePanelObserver.getState().notifyObservers()
+        })),
+        constVoid
+    ),
 
 }})
 
