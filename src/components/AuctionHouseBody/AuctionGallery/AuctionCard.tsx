@@ -5,8 +5,9 @@ import { pipe } from 'fp-ts/lib/function'
 import { useParallelAuctionState } from '../../../state/autoAuctionStore'
 import { hideSidePanelObserver, showSidePanelObserver } from '../../../state/observerStore'
 import { fromWei } from '../../../utils/web3'
-import { Countdown } from '../../Utils/Countdown'
 import { sleep } from '../../../utils/pure'
+import Countdown from 'react-countdown'
+import { defaultCountdownRenderer } from '../../CountdownPageCounter/CountdownPageCounter'
 
 interface AuctionCardProps {
     lineIndex: number;
@@ -55,7 +56,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
             <div className={style['details']}>
                 <span>{currentBid}</span>
                 <span> {O.isSome(endTime) ?
-                    <Countdown endTimestamp={endTime.value} /> : ''
+                    <Countdown date={endTime.value*1000} daysInHours/> : ''
                 } </span>
             </div>
             <button className={style['action']}>

@@ -50,10 +50,7 @@ export function unfunf <T,U>(
     return (t: T) => unfun(f(t))
 }
 
-// TODO This function is not pure, so it should be decoupled out of
-// this `pure.tsx`.
-export const formattedTimeLeft = (unixTimestamp: number): O.Option<string> => {
-    const diffInSeconds = Math.floor(unixTimestamp - Date.now() / 1000)
+export const formatTimeLeft = (diffInSeconds: number): O.Option<string> => {
     if (diffInSeconds < 0) return O.none
 
     const hours = Math.floor(diffInSeconds / 3600)
@@ -72,6 +69,17 @@ export const formattedTimeLeft = (unixTimestamp: number): O.Option<string> => {
 export const msTimeLeft = (unixTimestamp: number): number => {
     const diff = Math.floor(unixTimestamp - Date.now() / 1000)
     return diff * 1000
+}
+
+/**
+ * @returns The number of seconds left for `unixTimestamp`.
+ */
+export const timeLeftTo = (unixTimestamp: number): number =>
+    Math.floor(unixTimestamp - Date.now() / 1000)
+
+export const optTimeLeftTo = (unixTimestamp: number): O.Option<number> => {
+    const t = timeLeftTo(unixTimestamp)
+    return t > 0 ? O.some(t) : O.none
 }
 
 export const sleep = (s: number) => 
