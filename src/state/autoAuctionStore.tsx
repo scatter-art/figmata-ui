@@ -29,7 +29,7 @@ type ParallelAuctionData = {
     readonly tokenImagesUri: string
 }
 
-export const PROVIDER_DOWN_MESSAGE = () => 'Scatter is down, connect wallet :('
+export const PROVIDER_DOWN_MESSAGE = () => 'Connect wallet :('
 
 /**
  * @dev This store provides differente secure abstractions to interact
@@ -163,7 +163,6 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         if (!ethers.isAddress(auctionAddress)) return
         
         const bestProvider = useUserStore.getState().getBestProvider()
-        console.log(bestProvider)
         
         const auctionContract = pipe(
             bestProvider,

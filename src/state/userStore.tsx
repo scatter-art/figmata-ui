@@ -63,14 +63,14 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     userAddress: O.none,
     formattedUserAddress: '',
     // TODO do not have this hardcoded
-    defaultProvider: O.of(new InfuraProvider('sepolia', '7152891a745b45d2a0424dd45d6f4ab6')),
+    defaultProvider: O.of(new InfuraProvider('sepolia', process.env.REACT_APP_DEFAULT_PROVIDER)),
     userConnected: false,
 
     updateProviders: () => {
         set({ userProvider: get()._getUserProvider() })
         // TODO
         set({ defaultProvider: O.some(
-            new InfuraProvider('sepolia', '7152891a745b45d2a0424dd45d6f4ab6')
+            new InfuraProvider('sepolia', process.env.REACT_APP_DEFAULT_PROVIDER)
         )})
     },
 
