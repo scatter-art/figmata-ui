@@ -1,5 +1,5 @@
 import { 
-    BrowserProvider, JsonRpcSigner, Provider
+    BrowserProvider, InfuraProvider, JsonRpcSigner, Provider
 } from 'ethers'
 import { create } from 'zustand'
 
@@ -62,13 +62,16 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     userSigner: O.none,
     userAddress: O.none,
     formattedUserAddress: '',
-    defaultProvider: O.none,
+    // TODO do not have this hardcoded
+    defaultProvider: O.of(new InfuraProvider('sepolia', '7152891a745b45d2a0424dd45d6f4ab6')),
     userConnected: false,
 
     updateProviders: () => {
         set({ userProvider: get()._getUserProvider() })
         // TODO
-        set({ defaultProvider: O.none })
+        set({ defaultProvider: O.some(
+            new InfuraProvider('sepolia', '7152891a745b45d2a0424dd45d6f4ab6')
+        )})
     },
 
     getBestProvider: () => pipe(

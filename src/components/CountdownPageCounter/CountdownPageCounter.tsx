@@ -11,6 +11,8 @@ export const defaultCountdownRenderer: CountdownRendererFn = ({ completed, hours
 	)
 }
 
+const launchDate = new Date(Date.UTC(2023, 5, 22, 4, 0, 0, 0))
+
 export const CountdownPageCounter = () => {
 	const changePage = pageSwapObserver((s) => s.notifyObservers)
 
@@ -20,7 +22,7 @@ export const CountdownPageCounter = () => {
 				<div className={style['counter-inner']}>
 					{/* Please make correct date here ser TODO TODO TODO */}
 					<Countdown
-						date={Date.now() + 5000}
+						date={launchDate}
 						//renderer={defaultCountdownRenderer}
 						onComplete={changePage}
 						daysInHours

@@ -163,6 +163,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         if (!ethers.isAddress(auctionAddress)) return
         
         const bestProvider = useUserStore.getState().getBestProvider()
+        console.log(bestProvider)
         
         const auctionContract = pipe(
             bestProvider,
