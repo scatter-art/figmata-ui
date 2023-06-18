@@ -1,4 +1,3 @@
-import React from 'react'
 import style from './Header.module.css'
 import brandWordPixelady from '../../images/brand-word-pixelady.svg'
 import brandWordFigmata from '../../images/brand-word-figmata.svg'
@@ -9,14 +8,26 @@ export const Header = () => {
 		<header id={style['header']}>
 			<div className={style['brand-container']}>
 				<div className={style['title']}>
-					<img id={style['brand-word-pixelady']} src={brandWordPixelady} />
+					<img 
+                        id={style['brand-word-pixelady']} 
+                        src={brandWordPixelady}
+                        alt='pixeladyBrand'
+                    />
 
 					<span>AUCTION HOUSE</span>
 
-					<img id={style['brand-word-figmata']} src={brandWordFigmata} />
+					<img 
+                        id={style['brand-word-figmata']}
+                        src={brandWordFigmata}
+                        alt='figmataBrand'
+                    />
 				</div>
 
-				<img id={style['brand-banner-container']} src={brandBannerContainer} />
+				<img 
+                    id={style['brand-banner-container']}
+                    src={brandBannerContainer} 
+                    alt='bannerBrand'
+                />
 			</div>
 		</header>
 	)

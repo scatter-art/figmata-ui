@@ -1,8 +1,5 @@
-import { pipe } from 'fp-ts/lib/function'
 import { useUserStore } from '../../../state/userStore'
 import style from './DappConnector.module.css'
-import * as O from 'fp-ts/Option'
-import { formatAddr } from '../../../utils/web3'
 import toast from 'react-hot-toast'
 
 export const DappConnector = () => {

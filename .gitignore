@@ -25,3 +25,4 @@ yarn-error.log*
 # etc etc
 package-lock.json
 types
+.env

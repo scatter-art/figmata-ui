@@ -9,7 +9,7 @@ import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/lib/function'
 import { TE2, TO2 } from '../utils/pure'
-import { formatAddr, formatOptAddr } from '../utils/web3'
+import { formatOptAddr } from '../utils/web3'
 
 /**
  * @notice The system should work even if `O.isNone(defaultProvider)`
