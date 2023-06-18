@@ -8,12 +8,11 @@ import { PlaceBidButton } from './PlaceBidButton/PlaceBidButton'
 import { hideSidePanelObserver, reRenderSidePanelObserver, showSidePanelObserver } from '../../state/observerStore'
 import { sleep } from '../../utils/pure'
 import Countdown from 'react-countdown'
-import { defaultCountdownRenderer } from '../CountdownPageCounter/CountdownPageCounter'
 
 export const SidePanel: React.FC = () => {
 
 	const lineIndex = useParallelAuctionState((s) => s.currentLineIndex)
-	const subscription = reRenderSidePanelObserver((s) => s.observer)
+	reRenderSidePanelObserver((s) => s.observer) // Subscription
 
 	const tokenName = useParallelAuctionState((s) => s.getFormattedTokenName)(lineIndex)
 	const currentBid = useParallelAuctionState((s) => s.getFormattedCurrentBid)(lineIndex)
@@ -59,7 +58,7 @@ export const SidePanel: React.FC = () => {
 				</div>
 
 				<div id={style['focus-token-image-container']}>
-					<img id={style['focus-token-image']} src={imageUrl} />
+					<img id={style['focus-token-image']} src={imageUrl} alt='focusTokenImage' />
 				</div>
 
 				<div id={style['focus-token-auction-details-container']}>

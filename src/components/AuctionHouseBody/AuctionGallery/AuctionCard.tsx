@@ -7,7 +7,6 @@ import { hideSidePanelObserver, showSidePanelObserver } from '../../../state/obs
 import { fromWei } from '../../../utils/web3'
 import { sleep } from '../../../utils/pure'
 import Countdown from 'react-countdown'
-import { defaultCountdownRenderer } from '../../CountdownPageCounter/CountdownPageCounter'
 
 interface AuctionCardProps {
     lineIndex: number;
@@ -40,7 +39,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
         // NOTE This sleep should be based on how long the side panel
         // hidding animation takes.
         await sleep(0.25)
-        const newLine = await updateLine(lineIndex)
+        await updateLine(lineIndex)
         setCurrentSelectedLine(lineIndex)
         showSidePanel()
     }

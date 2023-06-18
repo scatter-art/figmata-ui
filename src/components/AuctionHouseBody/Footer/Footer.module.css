@@ -100,7 +100,7 @@ audio::-webkit-media-controls-time-remaining-display {
 	padding: 0 var(--gap-o);
 	flex-grow: 1;
 	display: flex;
-	justify-content: end;
+	justify-content: flex-end;
 	align-items: center;
 }
 

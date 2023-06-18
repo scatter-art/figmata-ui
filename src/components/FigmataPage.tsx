@@ -20,9 +20,9 @@ export const FigmataPage: React.FC = () => {
 			'Figmata',
 			'https://ipfs.io/ipfs/bafybeih5mqafo34424swmfdboww3s2tvfmzoojbip4jmcjbg5n3fl7edee'
 		)
-	}, [userConnected, auctionData])
+	}, [userConnected, auctionData, config])
 
-	useEffect(() => updateContractProviders(), [userConnected])
+	useEffect(updateContractProviders, [userConnected, updateContractProviders])
 
 	return (
 		<>

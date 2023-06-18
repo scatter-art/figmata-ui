@@ -3,7 +3,6 @@ import * as E from "fp-ts/lib/Either";
 import * as TO from 'fp-ts/TaskOption'
 import * as TE from 'fp-ts/TaskEither'
 import { identity, pipe } from "fp-ts/lib/function";
-import { BigNumberish, ethers } from "ethers";
 
 /**
  * @dev This function will unwrap a `TO.TaskOption` and try to run

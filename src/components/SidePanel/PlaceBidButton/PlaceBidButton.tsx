@@ -18,7 +18,7 @@ const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<A
 		O.bind('config', () => config),
 		O.flatMap(({ line, config }) =>
 			O.of(
-				fromWei(line.currentPrice) == '0.0'
+				fromWei(line.currentPrice) === '0.0'
 					? ethers.getBigInt(config.startingPrice)
 					: ethers.getBigInt(line.currentPrice) + ethers.getBigInt(config.bidIncrement)
 			)
@@ -106,7 +106,7 @@ export const PlaceBidButton = () => {
 
 		console.log({ ...receipt })
 
-		const newLine = await updateLine(lineIndex)
+		await updateLine(lineIndex)
 
 		setCurrentSelectedIndex(lineIndex)
 		handleModalClosing()
