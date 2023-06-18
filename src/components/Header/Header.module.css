@@ -63,7 +63,8 @@
 	position: absolute;
 	bottom: -84%;
 	font-family: var(--font-pixel);
-	color: var(--clr-ink-on-heavy);
+	color: var(--clr-accent-secondary);
+	font-weight: bold;
 	/* font-size: min(1.25rem, 1.5vw); */
 	font-size: 1.25rem;
 	transform: translateX(-67%);
