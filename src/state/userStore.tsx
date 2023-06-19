@@ -62,7 +62,7 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     userSigner: O.none,
     userAddress: O.none,
     formattedUserAddress: '',
-    // TODO do not have this hardcoded
+    // TODO Dont have the network hardcoded, also the logic could get cleaned a bit.
     defaultProvider: O.of(new InfuraProvider('sepolia', process.env.REACT_APP_DEFAULT_PROVIDER)),
     userConnected: false,
 
