@@ -58,7 +58,7 @@ export const SidePanel: React.FC = () => {
 				</div>
 
 				<div id={style['focus-token-image-container']}>
-					<img id={style['focus-token-image']} src={imageUrl} alt='focusTokenImage' />
+					<img id={style['focus-token-image']} src={imageUrl} alt='Pixelady Figmata NFT artwork' />
 				</div>
 
 				<div id={style['focus-token-auction-details-container']}>

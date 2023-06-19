@@ -32,6 +32,10 @@
 	max-width: 40%;
 }
 
+#brand-word-pixelady {
+	filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.33));
+}
+
 #brand-word-figmata {
 	animation-name: figmata-glow;
 	animation-duration: 4000ms;
@@ -43,52 +47,60 @@
 @keyframes figmata-glow {
 	0% {
 		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-a))
-			drop-shadow(0 0 56px var(--clr-accent-supplementary-a));
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-a))
+			drop-shadow(0 2px 2px rgba(0, 0, 0, 0.75));
 	}
 	33% {
 		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-b))
-			drop-shadow(0 0 56px var(--clr-accent-supplementary-b));
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-b))
+			drop-shadow(0 2px 2px rgba(0, 0, 0, 0.75));
 	}
 	66% {
 		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-c))
-			drop-shadow(0 0 56px var(--clr-accent-supplementary-c));
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-c))
+			drop-shadow(0 2px 2px rgba(0, 0, 0, 0.75));
 	}
 	100% {
 		filter: drop-shadow(0 0 24px var(--clr-accent-supplementary-d))
-			drop-shadow(0 0 56px var(--clr-accent-supplementary-d));
+			drop-shadow(0 0 56px var(--clr-accent-supplementary-d))
+			drop-shadow(0 2px 2px rgba(0, 0, 0, 0.75));
 	}
 }
 
 .brand-container > .title > span {
 	position: absolute;
-	bottom: -84%;
+	bottom: -82%;
 	font-family: var(--font-pixel);
 	color: var(--clr-accent-secondary);
 	font-weight: bold;
-	/* font-size: min(1.25rem, 1.5vw); */
 	font-size: 1.25rem;
 	transform: translateX(-67%);
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 }
 
 @media screen and (max-width: 1230px) {
 	.brand-container > .title > span {
-		bottom: -1.6vw;
-		font-size: 1.25vw;
-		transform: translateX(-9vw);
+		font-size: 1.4vw;
+		transform: translateX(-10vw);
+	}
+}
+
+@media screen and (max-width: 1080px) {
+	.brand-container > .title > span {
+		font-size: 1.5vw;
+		transform: translateX(-10.75vw);
 	}
 }
 
 @media screen and (max-width: 960px) {
 	.brand-container > .title > span {
-		bottom: -3vw;
-		font-size: 2.25vw;
-		transform: translateX(-64%);
+		font-size: 1.875vw;
+		transform: translateX(-13vw);
 	}
 }
 
 @media screen and (max-width: 860px) {
 	.brand-container > .title > span {
-		bottom: -3vw;
 		font-size: 2.25vw;
 		transform: translateX(-75%);
 	}

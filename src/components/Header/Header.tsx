@@ -11,7 +11,7 @@ export const Header = () => {
 					<img 
                         id={style['brand-word-pixelady']} 
                         src={brandWordPixelady}
-                        alt='pixeladyBrand'
+                        alt='Pixelady Figmata branding typography'
                     />
 
 					<span>AUCTION HOUSE</span>
@@ -19,14 +19,14 @@ export const Header = () => {
 					<img 
                         id={style['brand-word-figmata']}
                         src={brandWordFigmata}
-                        alt='figmataBrand'
+                        alt='Pixelady Figmata branding typography'
                     />
 				</div>
 
 				<img 
                     id={style['brand-banner-container']}
                     src={brandBannerContainer} 
-                    alt='bannerBrand'
+                    alt='Pixelady Figmata branding typography'
                 />
 			</div>
 		</header>

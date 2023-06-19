@@ -1,6 +1,6 @@
 /* HOST ----------------------------------- */
 #counter-container {
-	min-width: 12.5vw;
+	min-width: 20vw;
 	height: 120px;
 	padding: var(--gap-ii);
 	border-radius: 360px;
