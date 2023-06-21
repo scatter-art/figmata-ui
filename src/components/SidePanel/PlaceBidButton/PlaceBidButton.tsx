@@ -48,6 +48,8 @@ export const PlaceBidButton = () => {
 
 	const [inputValue, setInputValue] = useState<number>(0)
 
+    const getIsVip = useParallelAuctionState(s => s.getIsVip)
+
 	const handleNewInput = (newValue: number) => {
 		if (isNaN(newValue) || newValue < parseFloat(minPrice)) setInputValue(parseFloat(minPrice))
 		else setInputValue(newValue)
@@ -83,6 +85,11 @@ export const PlaceBidButton = () => {
     }
 
 	const handleBidConfirmation = async () => {
+        if(!(await getIsVip())) {
+            toast.error('Not a VIP!')
+            return
+        }
+
 		const toastAwaiting = toast.loading('Awaiting signature...')
 
 		const tx = await createBid(inputValue)

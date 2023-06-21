@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import * as O from 'fp-ts/Option'
 import * as TO from 'fp-ts/TaskOption'
 import * as A from 'fp-ts/Array'
-import { constVoid, pipe } from 'fp-ts/lib/function'
+import { constVoid, identity, pipe } from 'fp-ts/lib/function'
 
 import { 
     IExternallyMintable,
@@ -106,6 +106,8 @@ type ParallelAuctionStoreState = {
     getFormattedCurrentWinner: (forLineIndex: number) => string,
 
     createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
+
+    getIsVip: () => Promise<boolean>,
 
     
     /* --------------- HELPER FUNCTIONS --------------- */
@@ -351,6 +353,23 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
                 .createBid(line.head, { value: toWei(value)})
         ))
     )(),
+
+    getIsVip: async () => await pipe(
+        O.Do,
+        O.bind('signer', () => useUserStore.getState().userSigner),
+        O.bind('signerAddress', () => useUserStore.getState().userAddress),
+        O.bind('data', () => get().auctionData),
+        O.bind('auctionAddr', ({ data }) => O.of(data.auctionAddress)),
+        O.bind('newAbi', () => O.of(['function userIsVip(address user) public view returns (bool)'])),
+        O.bind('vipChecker', ({ auctionAddr, newAbi, signer }) => 
+            O.of(new ethers.Contract(auctionAddr, newAbi, signer))
+        ),
+        TO.fromOption,
+        TO.flatMap(({ vipChecker, signerAddress }) => TO.tryCatch(() =>
+            vipChecker.userIsVip(signerAddress)
+        )),
+        TO.map(x => x as boolean),
+    )().then(O.exists(identity)),
         
     _setLinesTimers: () => pipe(
         get().lines,

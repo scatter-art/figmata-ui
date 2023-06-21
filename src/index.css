@@ -34,8 +34,16 @@ code {
 	font-display: swap;
 }
 
+@font-face {
+	font-family: 'monogram';
+	src: local('monogram'), url(./font/monogram.ttf) format('truetype');
+	font-weight: 500;
+	font-display: swap;
+}
+
 :root {
 	--font-pixel: 'SF Pixelate', monospace;
+	--font-mono: 'monogram', monospace;
 }
 
 

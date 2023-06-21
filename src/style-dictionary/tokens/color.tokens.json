@@ -5,6 +5,7 @@
 		"accent-heavy": { "value": "#E16AB6" },
 		"accent-secondary": { "value": "#F3D842" },
 		"accent-secondary-heavy": { "value": "#8A7606" },
+		"accent-secondary-heavy-x": { "value": "#6A5B05" },
 		"accent-tertiary": { "value": "#59EF41" },
 		"accent-tertiary-heavy": { "value": "#095F59" },
 		"accent-supplementary-a": { "value": "#00A3FF" },
