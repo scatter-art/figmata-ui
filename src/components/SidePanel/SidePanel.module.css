@@ -162,3 +162,46 @@
 	position: absolute;
 	border-radius: var(--sp-2);
 }
+
+/* VIP BADGE ------------------------------ */
+.vip-badge-container {
+	width: 100%;
+	height: var(--sp-6);
+	padding: var(--gap-ii);
+	position: absolute;
+	bottom: var(--gap-ii);
+	/* left: 0; */
+	background-color: var(--clr-accent-secondary);
+	border-radius: var(--sp-6);
+	z-index: 2;
+}
+
+[data-is-vip='false'] .vip-badge-container {
+	display: none;
+}
+
+.vip-badge {
+	width: 100%;
+	height: 100%;
+	padding: 0 var(--gap-ii);
+	display: flex;
+	align-items: center;
+	border-radius: var(--sp-6);
+	outline: 1px solid transparent;
+	box-shadow: var(--ev-neu-1-accent-secondary);
+}
+
+.vip-badge > svg {
+	width: var(--sp-3);
+	height: var(--sp-3);
+	fill: var(--clr-accent-secondary-heavy-x);
+}
+
+.vip-string {
+	width: 100%;
+	padding: 0 var(--gap-ii);
+	display: flex; 
+	justify-content: center;
+	font-family: var(--font-mono);
+}
+

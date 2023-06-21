@@ -93,6 +93,12 @@ dialog[open] {
 	cursor: pointer;
 }
 
+#confirm-modal[disabled] {
+	background-color: #bdbdbd;
+	color: #969696;
+	box-shadow: none;
+}
+
 #confirm-modal,
 #connect-wallet {
 	color: var(--clr-accent-heavy);
