@@ -28,7 +28,7 @@
 
 @media screen and (max-width: 960px) {
 	#side-panel {
-		position: absolute;
+		position: fixed;
 		top: var(--gap-i);
 		right: 0;
 		transform: translateX(var(--panel-w));
