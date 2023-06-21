@@ -16,7 +16,7 @@ export const FigmataPage: React.FC = () => {
 		// TODO This all should be decoupled into a config file and
 		// evaluated from a store.
 		config(
-			'0x26432A2Ac3796081BBb19d02684b65Edc1dFe40d',
+			'0x5a5e12f15505F3836f68e47B1c858548C5077335',
 			'Figmata',
 			'https://ipfs.io/ipfs/bafybeih5mqafo34424swmfdboww3s2tvfmzoojbip4jmcjbg5n3fl7edee'
 		)
