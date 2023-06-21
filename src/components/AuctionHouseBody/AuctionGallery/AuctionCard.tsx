@@ -7,20 +7,23 @@ import { hideSidePanelObserver, showSidePanelObserver } from '../../../state/obs
 import { fromWei } from '../../../utils/web3'
 import { sleep } from '../../../utils/pure'
 import Countdown from 'react-countdown'
+import { vipIds } from './AuctionGallery'
 
 interface AuctionCardProps {
-    lineIndex: number;
-    isVip?: boolean
+    lineIndex: number
 }
 
-export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex, isVip }) => {
-    // TODO -> dynamically assign isVip for correct token #s
-    isVip = true
-    // 
+export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
 
     const updateLine = useParallelAuctionState(state => state.updateLine)
     const setCurrentSelectedLine = useParallelAuctionState(state => state.setCurrentSelectedIndex)
     const line = useParallelAuctionState(state => state.getLine)(lineIndex)
+
+    const isVip = pipe(
+        line,
+        O.map(l => l.head),
+        O.exists(i => vipIds.includes(Number(i)))
+    )
 
     const hideSidePanel = hideSidePanelObserver(s => s.notifyObservers)
     const showSidePanel = showSidePanelObserver(s => s.notifyObservers)
