@@ -8,14 +8,19 @@ import { PlaceBidButton } from './PlaceBidButton/PlaceBidButton'
 import { hideSidePanelObserver, reRenderSidePanelObserver, showSidePanelObserver } from '../../state/observerStore'
 import { sleep } from '../../utils/pure'
 import Countdown from 'react-countdown'
+import { pipe } from 'fp-ts/lib/function'
+import { vipIds } from '../AuctionHouseBody/AuctionGallery/AuctionGallery'
 
 export const SidePanel: React.FC = () => {
-	// TODO -> remove hardcoded isVip and rig correctly with sidepanel state
-	let isVip = true
-	// 
-
+	const line = useParallelAuctionState((state) => state.getCurrentSelectedLine)()
 	const lineIndex = useParallelAuctionState((s) => s.currentLineIndex)
 	reRenderSidePanelObserver((s) => s.observer) // Subscription
+
+    const isVip = pipe(
+        line,
+        O.map(l => l.head),
+        O.exists(i => vipIds.includes(Number(i)))
+    )
 
 	const tokenName = useParallelAuctionState((s) => s.getFormattedTokenName)(lineIndex)
 	const currentBid = useParallelAuctionState((s) => s.getFormattedCurrentBid)(lineIndex)
