@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { BigNumberish, ethers } from 'ethers'
 import { create } from 'zustand'
 
 import * as O from 'fp-ts/Option'
@@ -127,7 +127,7 @@ type ParallelAuctionStoreState = {
      * @dev Event function that should only trigger if an event
      * happens over `biddedId`.
      */
-    _onBidEventDo: (biddedId: bigint) => void
+    _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => void
 
 }
 
@@ -388,7 +388,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         ))
     ),
 
-    _onBidEventDo: (biddedId: bigint) => pipe(
+    _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => pipe(
         get().getAuctionConfig(),
         O.map(auctionConfig => auctionConfig.lines),
         O.map(lines => (Number(biddedId) - 1) % Number(lines)),

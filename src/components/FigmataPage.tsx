@@ -22,7 +22,8 @@ export const FigmataPage: React.FC = () => {
 		)
 	}, [userConnected, auctionData, config])
 
-	useEffect(updateContractProviders, [userConnected, updateContractProviders])
+    // ???
+	//useEffect(updateContractProviders, [userConnected, updateContractProviders])
 
 	return (
 		<>
