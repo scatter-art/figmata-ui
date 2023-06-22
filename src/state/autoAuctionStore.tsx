@@ -17,6 +17,7 @@ import { msTimeLeft, TO2 } from '../utils/pure'
 import { AuctionConfigStruct, LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 import { formatAddr, fromWei, toWei } from '../utils/web3'
 import { reRenderSidePanelObserver } from './observerStore'
+import { vipIds } from '../components/AuctionHouseBody/AuctionGallery/AuctionGallery'
 
 
 type ParallelAuctionData = {
@@ -107,7 +108,15 @@ type ParallelAuctionStoreState = {
 
     createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
 
+    /**
+     * @returns If the current user is vip.
+     */
     getIsVip: () => Promise<boolean>,
+
+    /**
+     * @returns If the current selected line is a vip id.
+     */
+    getCurrentLineIsVipId: () => boolean,
 
     
     /* --------------- HELPER FUNCTIONS --------------- */
@@ -370,7 +379,14 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         )),
         TO.map(x => x as boolean),
     )().then(O.exists(identity)),
-        
+
+    getCurrentLineIsVipId: () => pipe(
+        get().getCurrentSelectedLine(),
+        O.map(l => l.head),
+        O.exists(id => vipIds.includes(Number(id)))
+    ),
+
+    /* --------------- HELPER FUNCTIONS --------------- */
     _setLinesTimers: () => pipe(
         get().lines,
         O.map(A.mapWithIndex((i,_) => get()._setLineTimer(i)))
