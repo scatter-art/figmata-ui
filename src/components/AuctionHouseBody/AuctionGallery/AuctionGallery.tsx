@@ -21,6 +21,8 @@ export const AuctionGallery = () => {
 
 	return (
 		<div id={style['auction-container']}>
+            <div id={style['placeholder-overlay']}></div>
+
             {lines.map((_,i) => <AuctionCard 
                 lineIndex={i} 
                 key={i} 
