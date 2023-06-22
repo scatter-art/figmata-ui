@@ -96,6 +96,7 @@ code {
 	animation-iteration-count: infinite;
 	animation-direction: alternate-reverse;
 	animation-timing-function: linear;
+	z-index: 3;
 }
 
 #motif-border:nth-of-type(2) {
