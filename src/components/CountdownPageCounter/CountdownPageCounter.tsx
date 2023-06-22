@@ -12,7 +12,7 @@ export const defaultCountdownRenderer: CountdownRendererFn = ({ completed, hours
 }
 
 const launchDate = new Date(Date.UTC(2023, 5, 22, 4, 0, 0, 0))
-const testDate = Date.now() + 5000
+const testDate = Date.now() + 2000
 
 const finalDate = process.env.REACT_APP_PRODUCTION === 'true' ? launchDate : testDate
 

@@ -1,6 +1,7 @@
 import { useUserStore } from '../../../state/userStore'
 import style from './DappConnector.module.css'
 import toast from 'react-hot-toast'
+import * as E from 'fp-ts/Either'
 
 export const DappConnector = () => {
 	const userConnected = useUserStore((state) => state.userConnected)
@@ -9,10 +10,9 @@ export const DappConnector = () => {
 	const userAddr = useUserStore((state) => state.formattedUserAddress)
 
 	const handleClick = async () => {
-		if (!userConnected) {
-			connection()
+		if (!userConnected && E.isRight(await connection()))
 			toast.success('Wallet connected')
-		} else {
+		else {
 			disconnection()
 			toast('Wallet disconnected')
 		}

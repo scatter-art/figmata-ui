@@ -5,6 +5,7 @@
 	padding: var(--gap-o);
 	padding-left: calc(var(--gap-o) + var(--outer-border));
 	overflow-y: auto;
+	position: relative;
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
 	gap: var(--gap-o);
@@ -70,5 +71,65 @@
 @media screen and (max-width: 520px) {
 	#auction-container {
 		grid-template-columns: repeat(1, 1fr) !important;
+	}
+}
+
+/* PLACEHOLDER ---------------------------- */
+#placeholder-overlay {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+	background-color: var(--clr-surface);
+	z-index: 2;
+	animation-name: placeholder;
+	animation-duration: 400ms;
+	animation-delay: 2000ms;
+	animation-iteration-count: once;
+	animation-fill-mode: forwards;
+}
+
+@keyframes placeholder {
+	0% {
+		opacity: 1;
+	}
+	99% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 0;
+		display: none !important;
+		z-index: -1;
+	}
+}
+
+#placeholder-overlay::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-image: url('/public/u2b.webp');
+	background-position: center;
+	background-size: 12.5%;
+	background-repeat: no-repeat;
+	mix-blend-mode: luminosity;
+	animation-name: u2b-pulse;
+	animation-duration: 400ms;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+}
+
+@keyframes u2b-pulse {
+	from {
+		transform: scale(1) rotate(-2deg);
+		filter: blur(4px);
+	}
+	to {
+		transform: scale(1.5) rotate(2deg);
+		filter: blur(0);
 	}
 }

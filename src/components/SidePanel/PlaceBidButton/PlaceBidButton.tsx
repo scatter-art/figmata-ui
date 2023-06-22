@@ -9,6 +9,7 @@ import { ethers } from 'ethers'
 import { useUserStore } from '../../../state/userStore'
 import { reRenderSidePanelObserver } from '../../../state/observerStore'
 import toast from 'react-hot-toast'
+import { vipIds } from '../../AuctionHouseBody/AuctionGallery/AuctionGallery'
 
 
 const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<AuctionConfigStruct>): string => {
@@ -16,11 +17,10 @@ const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<A
 		O.Do,
 		O.bind('line', () => line),
 		O.bind('config', () => config),
-		O.flatMap(({ line, config }) =>
-			O.of(
-				fromWei(line.currentPrice) === '0.0'
-					? ethers.getBigInt(config.startingPrice)
-					: ethers.getBigInt(line.currentPrice) + ethers.getBigInt(config.bidIncrement)
+		O.flatMap(({ line, config }) => O.of(
+            line.currentWinner.toString() === '0x' + '0'.repeat(40)
+				? ethers.getBigInt(config.startingPrice)
+				: ethers.getBigInt(line.currentPrice) + ethers.getBigInt(config.bidIncrement)
 			)
 		)
 	)
@@ -48,6 +48,8 @@ export const PlaceBidButton = () => {
 	const currentBid = useParallelAuctionState((s) => s.getFormattedCurrentBid)(lineIndex)
 
 	const [inputValue, setInputValue] = useState<number>(0)
+
+    const getIsVip = useParallelAuctionState(s => s.getIsVip)
 
 	const handleNewInput = (newValue: number) => {
 		if (isNaN(newValue) || newValue < parseFloat(minPrice)) setInputValue(parseFloat(minPrice))
@@ -84,6 +86,17 @@ export const PlaceBidButton = () => {
     }
 
 	const handleBidConfirmation = async () => {
+        const isVipId = pipe(
+            line,
+            O.map(l => l.head),
+            O.exists(i => vipIds.includes(Number(i)))
+        )
+
+        if(isVipId && !(await getIsVip())) {
+            toast.error('Not a VIP!')
+            return
+        }
+
 		const toastAwaiting = toast.loading('Awaiting signature...')
 
 		const tx = await createBid(inputValue)
@@ -134,7 +147,7 @@ export const PlaceBidButton = () => {
 					type="number"
 					placeholder={minPrice}
 					min={minPrice}
-					step={minPrice.toString()}
+					step='0.025' // FIXME This shouldn't be hardcoded
 					onChange={(event) => handleNewInput(parseFloat(event.target.value))}
 					value={inputValue}
 				/>
@@ -149,9 +162,14 @@ export const PlaceBidButton = () => {
 							</button>
 						</div>
 					) : (
-						<button id={style['connect-wallet']} onClick={handleModalWalletConnection}>
-							Connect Wallet
-						</button>
+						<div className={style['action-row']}>
+                            <button id={style['cancel-modal']} onClick={handleModalClosing}>
+                                Cancel
+                            </button>
+                            <button id={style['confirm-modal']} onClick={handleModalWalletConnection}>
+                                Connect
+                            </button>
+						</div>
 					)}
 				</div>
 			</dialog>

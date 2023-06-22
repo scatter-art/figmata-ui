@@ -63,14 +63,14 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     userAddress: O.none,
     formattedUserAddress: '',
     // TODO Dont have the network hardcoded, also the logic could get cleaned a bit.
-    defaultProvider: O.of(new InfuraProvider('sepolia', process.env.REACT_APP_DEFAULT_PROVIDER)),
+    defaultProvider: O.of(new InfuraProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)),
     userConnected: false,
 
     updateProviders: () => {
         set({ userProvider: get()._getUserProvider() })
         // TODO
         set({ defaultProvider: O.some(
-            new InfuraProvider('sepolia', process.env.REACT_APP_DEFAULT_PROVIDER)
+            new InfuraProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)
         )})
     },
 
@@ -104,7 +104,10 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
             get().disconnectUser()
         } else {
             console.log('Wallet connected')
-            get()._getUserAddress()
+            // FIXME This is some hardcore spaguetti code, I should
+            // refactor the whole store now that I know some shit
+            // about this kind of design.
+            get()._getUserProvider() 
             set({ userConnected: true }) 
         }
         return connection

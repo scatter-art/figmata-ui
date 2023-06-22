@@ -10,19 +10,19 @@ export const FigmataPage: React.FC = () => {
 	const config = useParallelAuctionState((state) => state.setAuctionData)
 	const auctionData = useParallelAuctionState((state) => state.auctionData)
 	const userConnected = useUserStore((state) => state.userConnected)
-	const updateContractProviders = useParallelAuctionState((state) => state.updateContractsProvider)
 
 	useEffect(() => {
 		// TODO This all should be decoupled into a config file and
 		// evaluated from a store.
 		config(
-			'0x26432A2Ac3796081BBb19d02684b65Edc1dFe40d',
+			'0xd8DB2B119E0c1aDdb7969Ea2031963e373ebfFdE',
 			'Figmata',
-			'https://ipfs.io/ipfs/bafybeih5mqafo34424swmfdboww3s2tvfmzoojbip4jmcjbg5n3fl7edee'
+			'https://cloudflare-ipfs.com/ipfs/bafybeigw2oa3zw4rl2owcqm7f3yd7zcxzn37cvpantahh7n7kxlgov7u7e'
 		)
 	}, [userConnected, auctionData, config])
 
-	useEffect(updateContractProviders, [userConnected, updateContractProviders])
+    // ???
+	//useEffect(updateContractProviders, [userConnected, updateContractProviders])
 
 	return (
 		<>

@@ -17,8 +17,9 @@ body,
 	min-width: 100%;
 	max-width: 100%;
 	height: 100%;
-	overflow-x: hidden;
-	overscroll-behavior-y: none;
+	/* overflow-x: hidden;
+	overscroll-behavior-y: none; */
+	overflow: hidden;
 }
 
 code {
@@ -33,8 +34,16 @@ code {
 	font-display: swap;
 }
 
+@font-face {
+	font-family: 'monogram';
+	src: local('monogram'), url(./font/monogram.ttf) format('truetype');
+	font-weight: 500;
+	font-display: swap;
+}
+
 :root {
 	--font-pixel: 'SF Pixelate', monospace;
+	--font-mono: 'monogram', monospace;
 }
 
 
@@ -57,6 +66,7 @@ code {
 	height: 100%;
 	width: 100%;
 	padding: var(--gap-o) 0;
+	overflow: hidden;
 	display: flex;
 	gap: var(--gap-o);
 	background-image: url('/public/bg-main.webp');
@@ -86,6 +96,7 @@ code {
 	animation-iteration-count: infinite;
 	animation-direction: alternate-reverse;
 	animation-timing-function: linear;
+	z-index: 3;
 }
 
 #motif-border:nth-of-type(2) {
