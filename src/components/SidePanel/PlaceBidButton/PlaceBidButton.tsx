@@ -9,6 +9,7 @@ import { ethers } from 'ethers'
 import { useUserStore } from '../../../state/userStore'
 import { reRenderSidePanelObserver } from '../../../state/observerStore'
 import toast from 'react-hot-toast'
+import { vipIds } from '../../AuctionHouseBody/AuctionGallery/AuctionGallery'
 
 
 const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<AuctionConfigStruct>): string => {
@@ -85,7 +86,13 @@ export const PlaceBidButton = () => {
     }
 
 	const handleBidConfirmation = async () => {
-        if(!(await getIsVip())) {
+        const isVipId = pipe(
+            line,
+            O.map(l => l.head),
+            O.exists(i => vipIds.includes(Number(i)))
+        )
+
+        if(isVipId && !(await getIsVip())) {
             toast.error('Not a VIP!')
             return
         }
