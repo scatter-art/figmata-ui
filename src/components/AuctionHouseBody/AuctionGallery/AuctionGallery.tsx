@@ -6,7 +6,7 @@ import { AuctionCard } from './AuctionCard'
 
 // Epic hardcode :3
 export const vipIds = [
-    1, 7, 51, 55, 171, 81, 114, 180, 230, 211, 210, 17, 179, 247, 288, 308, 36, 323
+    1, 7, 51, 55, 171, 81, 114, 180, 230, 211, 210, 17, 179, 247, 288, 308, 36, 323, 8
 ]
 
 export const AuctionGallery = () => {

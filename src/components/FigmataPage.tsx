@@ -18,7 +18,7 @@ export const FigmataPage: React.FC = () => {
 		config(
 			'0x5a5e12f15505F3836f68e47B1c858548C5077335',
 			'Figmata',
-			'https://ipfs.io/ipfs/bafybeih5mqafo34424swmfdboww3s2tvfmzoojbip4jmcjbg5n3fl7edee'
+			'https://cloudflare-ipfs.com/ipfs/bafybeigw2oa3zw4rl2owcqm7f3yd7zcxzn37cvpantahh7n7kxlgov7u7e'
 		)
 	}, [userConnected, auctionData, config])
 
