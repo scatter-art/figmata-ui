@@ -1,5 +1,5 @@
 import { 
-    BrowserProvider, InfuraProvider, JsonRpcSigner, Provider
+    BrowserProvider, JsonRpcSigner, Provider, AlchemyProvider
 } from 'ethers'
 import { create } from 'zustand'
 
@@ -63,14 +63,14 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     userAddress: O.none,
     formattedUserAddress: '',
     // TODO Dont have the network hardcoded, also the logic could get cleaned a bit.
-    defaultProvider: O.of(new InfuraProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)),
+    defaultProvider: O.of(new AlchemyProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)),
     userConnected: false,
 
     updateProviders: () => {
         set({ userProvider: get()._getUserProvider() })
         // TODO
         set({ defaultProvider: O.some(
-            new InfuraProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)
+            new AlchemyProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)
         )})
     },
 
