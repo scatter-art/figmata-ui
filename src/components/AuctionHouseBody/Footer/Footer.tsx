@@ -23,7 +23,7 @@ export const Footer = () => {
 			</div>
 
 			<div id={style['social-button-container']}>
-				<a href="/" target="_blank" rel="noopener noreferrer">
+				<a href="https://etherscan.io/address/0xd8db2b119e0c1addb7969ea2031963e373ebffde" target="_blank" rel="noopener noreferrer">
 					<svg width="22" height="22" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g clipPath="url(#clip0_7_346)">
 							<path
