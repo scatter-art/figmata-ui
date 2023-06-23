@@ -9,8 +9,6 @@ import { ethers } from 'ethers'
 import { useUserStore } from '../../../state/userStore'
 import { reRenderSidePanelObserver } from '../../../state/observerStore'
 import toast from 'react-hot-toast'
-import { vipIds } from '../../AuctionHouseBody/AuctionGallery/AuctionGallery'
-
 
 const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<AuctionConfigStruct>): string => {
 	const newPrice = pipe(
@@ -30,22 +28,24 @@ const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<A
 
 // TODO ??? Fix this, the state is all over the place.
 export const PlaceBidButton = () => {
-	const line = useParallelAuctionState((state) => state.getCurrentSelectedLine)()
-	const lineIndex = useParallelAuctionState((state) => state.currentLineIndex)
-	const reRenderSidePanel = reRenderSidePanelObserver((s) => s.notifyObservers)
+	const line = useParallelAuctionState(s => s.getCurrentSelectedLine)()
+	const lineIndex = useParallelAuctionState(s => s.currentLineIndex)
+	const reRenderSidePanel = reRenderSidePanelObserver(s => s.notifyObservers)
 
-	const updateLine = useParallelAuctionState((state) => state.updateLine)
-	const setCurrentSelectedIndex = useParallelAuctionState((state) => state.setCurrentSelectedIndex)
+	const updateLine = useParallelAuctionState(s => s.updateLine)
+	const setCurrentSelectedIndex = useParallelAuctionState(s => s.setCurrentSelectedIndex)
+    const getIsVipId = useParallelAuctionState(s => s.getCurrentLineIsVipId)
 
-	const config = useParallelAuctionState((state) => state.getAuctionConfig)()
-	const createBid = useParallelAuctionState((state) => state.createBid)
+	const config = useParallelAuctionState(s => s.getAuctionConfig)()
+	const createBid = useParallelAuctionState(s => s.createBid)
 
-	const userConnected = useUserStore((state) => state.userConnected)
-	const connection = useUserStore((state) => state.connectUser)
+	const userConnected = useUserStore(s => s.userConnected)
+	const connection = useUserStore(s => s.connectUser)
+	const getIsRightChainId = useUserStore(s => s.isRightChainId)
 
 	const minPrice = calcMinPriceForLine(line, config)
 
-	const currentBid = useParallelAuctionState((s) => s.getFormattedCurrentBid)(lineIndex)
+	const currentBid = useParallelAuctionState(s => s.getFormattedCurrentBid)(lineIndex)
 
 	const [inputValue, setInputValue] = useState<number>(0)
 
@@ -56,9 +56,7 @@ export const PlaceBidButton = () => {
 		else setInputValue(newValue)
 	}
 
-	useEffect(() => {
-		setInputValue(parseFloat(minPrice))
-	}, [minPrice])
+	useEffect(() => setInputValue(parseFloat(minPrice)) , [minPrice])
 
 	const getModal = () => pipe(
         O.fromNullable(document.getElementById('bidModal')),
@@ -86,13 +84,13 @@ export const PlaceBidButton = () => {
     }
 
 	const handleBidConfirmation = async () => {
-        const isVipId = pipe(
-            line,
-            O.map(l => l.head),
-            O.exists(i => vipIds.includes(Number(i)))
-        )
+        
+        if(!(await getIsRightChainId())) {
+            toast.error('Connect to ethereum!')
+            return
+        }
 
-        if(isVipId && !(await getIsVip())) {
+        if(getIsVipId() && !(await getIsVip())) {
             toast.error('Not a VIP!')
             return
         }
@@ -121,6 +119,7 @@ export const PlaceBidButton = () => {
 
 		await updateLine(lineIndex)
 
+        // NOTE This call might be confusing...
 		setCurrentSelectedIndex(lineIndex)
 		handleModalClosing()
 	}

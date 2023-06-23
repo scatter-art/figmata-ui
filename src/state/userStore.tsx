@@ -1,5 +1,5 @@
 import { 
-    BrowserProvider, InfuraProvider, JsonRpcSigner, Provider
+    BrowserProvider, JsonRpcSigner, Provider, AlchemyProvider
 } from 'ethers'
 import { create } from 'zustand'
 
@@ -43,6 +43,8 @@ export type UserStoreState = {
      */
     disconnectUser: () => void,
 
+    isRightChainId: () => Promise<boolean>,
+
     /**
      * @dev Tries to connect the user.
      * @returns Failure or succes.
@@ -63,14 +65,14 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
     userAddress: O.none,
     formattedUserAddress: '',
     // TODO Dont have the network hardcoded, also the logic could get cleaned a bit.
-    defaultProvider: O.of(new InfuraProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)),
+    defaultProvider: O.of(new AlchemyProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)),
     userConnected: false,
 
     updateProviders: () => {
         set({ userProvider: get()._getUserProvider() })
         // TODO
         set({ defaultProvider: O.some(
-            new InfuraProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)
+            new AlchemyProvider(process.env.REACT_APP_NETWORK, process.env.REACT_APP_DEFAULT_PROVIDER)
         )})
     },
 
@@ -111,6 +113,36 @@ export const useUserStore = create<UserStoreState>((set, get) => ({
             set({ userConnected: true }) 
         }
         return connection
+    },
+
+    isRightChainId: async () => {
+        const userNetId = await pipe(
+            TO.fromOption(get().userProvider),
+            TO2.flatTry(prov => prov.getNetwork()),
+            TO.map(net => net.chainId)
+        )()
+
+        const providerNetId = await pipe(
+            TO.fromOption(get().defaultProvider),
+            TO2.flatTry(prov => prov.getNetwork()),
+            TO.map(net => net.chainId)
+        )()
+        
+        const defaultChainId = pipe(
+            O.fromNullable(process.env.REACT_APP_CHAINID),
+            O.map(Number),
+            O.getOrElse(() => 1)
+        )
+
+        if (O.isNone(providerNetId)) return pipe(
+            userNetId,
+            O.exists(x => x === BigInt(defaultChainId))
+        )
+
+        return pipe(
+            userNetId,
+            O.exists(x => x === providerNetId.value)
+        )
     },
 
     _getUserProvider: () => {
