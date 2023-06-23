@@ -7,22 +7,19 @@ import { Header } from './Header/Header'
 import { Toaster } from 'react-hot-toast'
 
 export const FigmataPage: React.FC = () => {
-	const config = useParallelAuctionState((state) => state.setAuctionData)
-	const auctionData = useParallelAuctionState((state) => state.auctionData)
-	const userConnected = useUserStore((state) => state.userConnected)
+	const config = useParallelAuctionState(s => s.setAuctionData)
+	const auctionData = useParallelAuctionState(s => s.auctionData)
+	const userConnected = useUserStore(s => s.userConnected)
 
 	useEffect(() => {
 		// TODO This all should be decoupled into a config file and
 		// evaluated from a store.
 		config(
-			'0xd8DB2B119E0c1aDdb7969Ea2031963e373ebfFdE',
+			process.env.REACT_APP_AUCTION_CONTRACT!,
 			'Figmata',
-			'https://cloudflare-ipfs.com/ipfs/bafybeigw2oa3zw4rl2owcqm7f3yd7zcxzn37cvpantahh7n7kxlgov7u7e'
+			process.env.REACT_APP_IMAGES_URI!
 		)
 	}, [userConnected, auctionData, config])
-
-    // ???
-	//useEffect(updateContractProviders, [userConnected, updateContractProviders])
 
 	return (
 		<>
