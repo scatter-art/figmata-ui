@@ -7,7 +7,7 @@ import { hideSidePanelObserver, showSidePanelObserver } from '../../../state/obs
 import { fromWei } from '../../../utils/web3'
 import { sleep } from '../../../utils/pure'
 import Countdown from 'react-countdown'
-import { vipIds } from './AuctionGallery'
+import { VipBadgeSvg } from './VipBadgeSvg'
 
 interface AuctionCardProps {
     lineIndex: number
@@ -15,32 +15,30 @@ interface AuctionCardProps {
 
 export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
 
-    const updateLine = useParallelAuctionState(state => state.updateLine)
-    const setCurrentSelectedLine = useParallelAuctionState(state => state.setCurrentSelectedIndex)
-    const line = useParallelAuctionState(state => state.getLine)(lineIndex)
-
-    const isVip = pipe(
-        line,
-        O.map(l => l.head),
-        O.exists(i => vipIds.includes(Number(i)))
-    )
+    const updateLine             = useParallelAuctionState(s => s.updateLine)
+    const setCurrentSelectedLine = useParallelAuctionState(s => s.setCurrentSelectedIndex)
+    const line                   = useParallelAuctionState(s => s.getLine(lineIndex))
+    const imageUrl               = useParallelAuctionState(s => s.getImage(lineIndex))
+    const isVip                  = useParallelAuctionState(s => s.getLineIsVip(line))
 
     const isUserWinning = true;
 
     const hideSidePanel = hideSidePanelObserver(s => s.notifyObservers)
     const showSidePanel = showSidePanelObserver(s => s.notifyObservers)
 
-    const imageUrl = useParallelAuctionState(s => s.getImage)(lineIndex)
-
-    const currentBid = pipe(
+    const formattedCurrentBid = pipe(
         line,
-        O.map(line => `BID: ${fromWei(line.currentPrice)}`),
-        O.getOrElse(() => '')
+        O.map(l => l.currentPrice),
+        O.map(fromWei),
+        O.map(parseFloat),
+        O.map(n => n.toFixed(2)),
+        O.map(f => `BID: ${f}`),
+        O.getOrElse(() => '0.00')
     )
 
     const endTime = pipe(
         line,
-        O.map(line => Number(line.endTime)),
+        O.map(l => Number(l.endTime)),
     )
 
     const onCardClick = async () => {
@@ -76,7 +74,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
 
                 <div className={style['vip-badge-container']}>
                     <div className={style['vip-badge']}>
-                    <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m772-635-43-100-104-46 104-45 43-95 43 95 104 45-104 46-43 100Zm0 595-43-96-104-45 104-45 43-101 43 101 104 45-104 45-43 96ZM333-194l-92-197-201-90 201-90 92-196 93 196 200 90-200 90-93 197Z"/></svg>
+                        <VipBadgeSvg />
                     </div>
                 </div>
 
@@ -89,7 +87,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
                 </div>
             </div>
             <div className={style['details']}>
-                <span>{currentBid}</span>
+                <span>{formattedCurrentBid}</span>
                 <span> {O.isSome(endTime) ?
                     <Countdown date={endTime.value*1000} daysInHours/> : ''
                 } </span>
