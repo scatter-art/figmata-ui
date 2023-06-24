@@ -17,8 +17,17 @@ import { msTimeLeft, TO2 } from '../utils/pure'
 import { AuctionConfigStruct, LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 import { formatAddr, fromWei, toWei } from '../utils/web3'
 import { reRenderSidePanelObserver } from './observerStore'
-import { vipIds } from '../components/AuctionHouseBody/AuctionGallery/AuctionGallery'
 
+// Epic hardcodes :3
+export const PROVIDER_DOWN_MESSAGE = () => 'Connect wallet :('
+export const vipIds = [
+    1, 7, 51, 55, 171, 81, 114, 180, 230, 211, 210, 17, 179, 247, 288, 308, 36, 323, 8
+]
+// Should I harcode those kinds of states? I think I should abstract
+// this pattern of loading the whole immutable system state, because
+// having lots of silly consts like `tokenName` only make the store
+// uglier.
+export const auctionsAtTheSameTime = 10
 
 type ParallelAuctionData = {
     readonly auctionAddress: string,
@@ -29,8 +38,6 @@ type ParallelAuctionData = {
     readonly tokenName: string,
     readonly tokenImagesUri: string
 }
-
-export const PROVIDER_DOWN_MESSAGE = () => 'Connect wallet :('
 
 /**
  * @dev This store provides differente secure abstractions to interact
@@ -117,6 +124,11 @@ type ParallelAuctionStoreState = {
      * @returns If the current selected line is a vip id.
      */
     getCurrentLineIsVipId: () => boolean,
+
+    /**
+     * @returns If the 
+     */
+    getLineIsVip: (line: O.Option<LineStateStruct>) => boolean,
 
     
     /* --------------- HELPER FUNCTIONS --------------- */
@@ -382,8 +394,13 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
 
     getCurrentLineIsVipId: () => pipe(
         get().getCurrentSelectedLine(),
+        get().getLineIsVip,
+    ),
+
+    getLineIsVip: l => pipe(
+        l,
         O.map(l => l.head),
-        O.exists(id => vipIds.includes(Number(id)))
+        O.exists(i => vipIds.includes(Number(i)))
     ),
 
     /* --------------- HELPER FUNCTIONS --------------- */

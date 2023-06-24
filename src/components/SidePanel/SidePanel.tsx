@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { PROVIDER_DOWN_MESSAGE, useParallelAuctionState } from '../../state/autoAuctionStore'
+import { PROVIDER_DOWN_MESSAGE, useParallelAuctionState, vipIds } from '../../state/autoAuctionStore'
 import { DappConnector } from './DappConnector/DappConnector'
 import * as O from 'fp-ts/Option'
 import style from './SidePanel.module.css'
@@ -9,7 +9,6 @@ import { hideSidePanelObserver, reRenderSidePanelObserver, showSidePanelObserver
 import { sleep } from '../../utils/pure'
 import Countdown from 'react-countdown'
 import { pipe } from 'fp-ts/lib/function'
-import { vipIds } from '../AuctionHouseBody/AuctionGallery/AuctionGallery'
 
 export const SidePanel: React.FC = () => {
 	const line = useParallelAuctionState((state) => state.getCurrentSelectedLine)()
