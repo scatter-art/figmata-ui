@@ -1,0 +1,114 @@
+/* HOST ----------------------------------- */
+.gallery-modal-tile-container {
+    max-height: fit-content;
+    padding: var(--gap-i);
+    grid-column: span 1;
+    display: flex;
+    gap: var(--gap-i);
+    border-radius: var(--sp-1);
+    box-shadow: var(--ev-neu-1);
+}
+
+@media screen and (max-width: 720px) {
+    .gallery-modal-tile-container {
+        flex-direction: column;
+    }
+}
+
+/* IMAGE ---------------------------------- */
+.thumb {
+    max-width: calc(var(--sp-12) * 2);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--sp-1);
+    box-shadow: var(--ev-neu-1-inset);
+}
+
+@media screen and (max-width: 720px) {
+    .thumb {
+        max-width: 100%;
+        max-height: calc(var(--sp-12) * 4);
+    }
+}
+
+.thumb img {
+    width: 120%;
+}
+
+/* BODY ----------------------------------- */
+.body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-i);
+}
+
+/* ROWS ----------------------------------- */
+h3 {
+    text-align: start;
+    font-family: var(--font-pixel);
+    font-size: 1.125rem;
+    color: var(--clr-accent);
+    font-weight: 500;
+}
+
+span {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    color: var(--clr-ink-secondary);
+}
+
+span:first-child {
+    opacity: 0.75;
+}
+
+.row {
+    max-height: var(--sp-5);
+    padding: var(--gap-i);
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--sp-1);
+    box-shadow: var(--ev-neu-1-inset);
+}
+
+@media screen and (max-width: 720px) {
+    .row {
+        max-height: fit-content;
+        flex-direction: column;
+        align-items: start;
+        gap: var(--gap-ii);
+    }
+}
+
+.aux {
+    min-height: var(--sp-5);
+    /* max-height: var(--sp-5); */
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--gap-i);
+}
+
+.aux > a {
+    height: var(--sp-5);
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--sp-5);
+    background-color: var(--clr-surface);
+    box-shadow: var(--ev-neu-inner-action);
+}
+
+.aux > a > svg {
+    transition: 300ms;
+}
+
+.aux > a:hover > svg {
+    transform: scale(1.125);
+}
