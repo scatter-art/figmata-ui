@@ -8,29 +8,7 @@
 	overflow: hidden;
 	display: flex;
 	justify-content: space-between;
-}
-
-/* GALLERY BUTTON ------------------------- */
-#gallery-button-container {
-	padding: var(--sp-9);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: var(--sp-12);
-	background-color: var(--clr-accent-tertiary);
-	transform: translateY(-32.5%);
-}
-
-#gallery-button {
-	padding: var(--sp-1) var(--sp-5);
-	border-style: none;
-	border-radius: var(--sp-5);
-	background-color: var(--clr-accent-tertiary);
-	font-family: var(--font-pixel);
-	font-size: 1rem;
-	color: var(--clr-accent-tertiary-heavy);
-	box-shadow: var(--ev-neu-1-accent-tertiary);
-	cursor: pointer;
+	gap: var(--gap-ii);
 }
 
 /* MUSIC BUTTON --------------------------- */
