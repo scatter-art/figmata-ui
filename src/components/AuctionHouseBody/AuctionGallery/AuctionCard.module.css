@@ -1,6 +1,7 @@
 /* HOST ----------------------------------- */
 .auction-card {
 	padding: var(--gap-ii);
+	position: relative;
 	grid-column: span 1;
 	display: flex;
 	flex-direction: column;
@@ -180,7 +181,7 @@
 }
 
 .vip-string:nth-of-type(1) {
-	top: calc(var(--gap-ii) * -1);
+	top: calc(var(--gap-ii) * -3);
 	transition: 150ms;
 	transition-delay: 200ms;
 }
@@ -240,4 +241,60 @@
 
 .action:hover {
 	border: 1px solid var(--clr-accent);
+}
+
+/* WINNING BADGE --------------------------- */
+.user-winning-badge {
+	position: absolute;
+	top: 0;
+	right: var(--gap-i);
+}
+
+[data-is-winning='false'] .user-winning-badge {
+	display: none;
+}
+
+/* WINNING STRING ------------------------- */
+.user-winning-string-container {
+	height: var(--sp-3);
+	padding-bottom: 2px;
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	right: var(--sp-1);
+	left: var(--sp-1);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: var(--sp-3);
+	background-color: var(--clr-accent-secondary);
+	z-index: 6;
+	transition: 300ms;
+}
+
+[data-is-winning='true']:hover .user-winning-string-container {
+	opacity: 1;
+	top: calc(var(--gap-i) * -1.25);
+}
+
+[data-is-winning='true']:hover .user-winning-string-container {
+	animation-name: winning-pulse;
+	animation-duration: 1200ms;
+	animation-iteration-count: infinite;
+	animation-direction: alternate-reverse;
+	animation-timing-function: linear;
+}
+
+@keyframes winning-pulse {
+	from {
+		transform: scale(1);
+	}
+	to {
+		transform: scale(0.875);
+	}
+}
+
+.user-winning-string-container > span {
+	color: var(--clr-accent-secondary-heavy);
+	filter: drop-shadow(0 0 2px var(--clr-accent-secondary));
 }
