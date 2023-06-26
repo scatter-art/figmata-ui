@@ -13,10 +13,11 @@ import {
 } from '../types'
 
 import { useUserStore } from './userStore'
-import { msTimeLeft, TO2 } from '../utils/pure'
+import { TO2 } from '../utils/pure'
 import { AuctionConfigStruct, LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 import { formatAddr, fromWei, toWei } from '../utils/web3'
 import { reRenderSidePanelObserver } from './observerStore'
+import { useLineTimersStore } from './lineTimeoutsStore'
 
 // Epic hardcodes :3
 export const PROVIDER_DOWN_MESSAGE = () => 'Connect wallet :('
@@ -91,12 +92,6 @@ type ParallelAuctionStoreState = {
         tokenImagesUri: string
     ) => void,
     
-    /**
-     * @dev This function will reinitialize `auctionData` but using
-     * the user provider if its set.
-     */
-    updateContractsProvider: () => void,
-    
     /* ------------- GENERAL CONTRACT QUERIES ------------- */
 
     getImage: (forLineIndex: number) => string,
@@ -131,24 +126,18 @@ type ParallelAuctionStoreState = {
     getLineIsVip: (line: O.Option<LineStateStruct>) => boolean,
 
     
-    /* --------------- HELPER FUNCTIONS --------------- */
-    /**
-     * @dev It will set an event so the lines get automatically
-     * updated after the auction time ends.
-     */
-    _setLinesTimers: () => void,
-    
-    /**
-     * @dev It will set an event so `lineOpt` gets automatically
-     * updated after its auction time ends.
-     */
-    _setLineTimer: (lineIndex: number) => void
-    
+    /* --------------- CALLBACK FUNCTIONS --------------- */
     /**
      * @dev Event function that should only trigger if an event
      * happens over `biddedId`.
      */
-    _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => void
+    _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => void,
+
+    /**
+     * @dev Callback function that will restart a line data on its
+     * timer end.
+     */
+    _onLineTimerEndDo: (index: number) => void
 
 }
 
@@ -225,7 +214,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             O.map((data) => ({...data, auctionAddress}))
         )
         
-        set({ auctionData: data })
+        if (O.isNone(data)) return
         
         // Once updated the auction data we get all the lines state.
         const maxSupply = await pipe(
@@ -245,6 +234,9 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             )),
         )()
         
+        if (O.isNone(lineOpts)) return
+
+        set({ auctionData: data })
         set({ lines: lineOpts })
         
         // Finally, we specify all events that will manipulate `lines`.
@@ -252,68 +244,55 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             auctionContract,
             O.map(c => c.addListener('Bid', get()._onBidEventDo))
         )
-
-        get()._setLinesTimers()
-
-    },
-
-    updateContractsProvider: () => {
-        const userProviderOpt = useUserStore.getState().userProvider
-        const auctionDataOpt = get().auctionData
-
-        if (O.isNone(auctionDataOpt) || O.isNone(userProviderOpt)) return
-
-        const userProvider = userProviderOpt.value
-        const data = auctionDataOpt.value
         
-        const auctionContract = IParallelAutoAuction__factory.connect(data.auctionAddress, userProvider)
-        const auctionedToken = IExternallyMintable__factory.connect(data.auctionedTokenAddress, userProvider)
-    
-        set({ auctionData: O.of({...data, auctionContract, auctionedToken }) })
-    },
-    
-    updateLine: async (lineIndexToUpdate: number) => {
+        // Setting callback function for timers.
+        useLineTimersStore.getState().setCallbackIfDoesntExist(        
+            get()._onLineTimerEndDo 
+        )
 
-        const lineToUpdate = get().getLine(lineIndexToUpdate)
+        // Setting all timers.
+        pipe(
+            get().lines,
+            O.map(A.mapWithIndex((i,l) => pipe(
+                l,
+                O.map(l => useLineTimersStore.getState().clearAndSetTimerFor(i,l))
+            )))
+        )
+    },
+
+    updateLine: async (lineIndexToUpdate) => {
+
+        const lineToUpdateOpt = get().getLine(lineIndexToUpdate)
+        const allLinesOpt = get().lines
+
+        if (O.isNone(lineToUpdateOpt) || O.isNone(allLinesOpt)) return O.none
+
+        const lineToUpdate = lineToUpdateOpt.value
+        const allLines = allLinesOpt.value
 
         const newLine = await pipe(
-            O.Do,
-            O.bind('lineToUpdate', () => lineToUpdate),
-            O.bind('auctionData', () => get().auctionData),
+            get().auctionData,
             TO.fromOption,
-            TO.flatMap(({ auctionData, lineToUpdate }) => TO.tryCatch( 
-                () => auctionData.auctionContract.lineState(Number(lineToUpdate.head))
-            )),
+            TO2.flatTry(data => 
+                data.auctionContract.lineState(Number(lineToUpdate.head))
+            ),
         )()
-
     
-        const allLines = get().lines
-        
         // NOTE Index could be out of bounds.
-        const indexToMutate = pipe(
-            O.Do,
-            O.bind('allLines', () => allLines),
-            O.bind('lineToUpdate', () => lineToUpdate),
-            O.map(({ allLines, lineToUpdate }) => allLines.findIndex(pipe(
-                O.exists(line => line.head === lineToUpdate.head),
-            ))),
-        )
+        const indexToMutate = allLines.findIndex(pipe(
+            O.exists(line => line.head === lineToUpdate.head)
+        ))
 
-        const updatedLines = pipe(
-            O.Do,
-            O.bind('i', () => indexToMutate),
-            O.bind('allLines', () => allLines),
-            O.map(({ i, allLines }) => {
-                if (allLines[i] !== undefined) allLines[i] = newLine
-                return allLines
-            })
+        if (allLines[indexToMutate] !== undefined && O.isSome(newLine)) 
+            allLines[indexToMutate] = newLine
+        else return O.none
+
+        set({ lines: O.some(allLines) }) 
+        
+        useLineTimersStore.getState().clearAndSetTimerFor(
+            lineIndexToUpdate, newLine.value
         )
         
-        if (O.isSome(updatedLines)) {
-            set({ lines: updatedLines })
-            get()._setLineTimer(lineIndexToUpdate)
-        }
-
         return newLine
     },
     
@@ -403,24 +382,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.exists(i => vipIds.includes(Number(i)))
     ),
 
-    /* --------------- HELPER FUNCTIONS --------------- */
-    _setLinesTimers: () => pipe(
-        get().lines,
-        O.map(A.mapWithIndex((i,_) => get()._setLineTimer(i)))
-    ),
-    
-    _setLineTimer: (lineIndex: number) => pipe(
-        get().getLine(lineIndex),
-        O.map(line => setTimeout(
-            async () => {
-                await get().updateLine(lineIndex)
-                if (lineIndex === get().currentLineIndex)
-                    reRenderSidePanelObserver.getState().notifyObservers()
-            },
-            msTimeLeft(ethers.toNumber(line.endTime))
-        ))
-    ),
-
+    /* --------------- CALLBACK FUNCTIONS --------------- */
     _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => pipe(
         get().getAuctionConfig(),
         O.map(auctionConfig => auctionConfig.lines),
@@ -431,6 +393,12 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         })),
         constVoid
     ),
+
+    _onLineTimerEndDo: async (index: number) => {
+        await get().updateLine(index)
+        if (index === get().currentLineIndex)
+            reRenderSidePanelObserver.getState().notifyObservers()
+    }
 
 }})
 
