@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { PROVIDER_DOWN_MESSAGE, useParallelAuctionState } from '../../../state/autoAuctionStore'
 import style from './PlaceBidButton.module.css'
 import * as O from 'fp-ts/Option'
-import { pipe } from 'fp-ts/lib/function'
+import * as E from 'fp-ts/Either'
+import { constVoid, pipe } from 'fp-ts/lib/function'
 import { AuctionConfigStruct, LineStateStruct } from '../../../types/IHoldsParallelAutoAuctionData'
 import { fromWei } from '../../../utils/web3'
 import { ethers } from 'ethers'
@@ -50,11 +51,7 @@ export const PlaceBidButton = () => {
 	const [inputValue, setInputValue] = useState<number>(0)
 
     const getIsVip = useParallelAuctionState(s => s.getIsVip)
-
-	const handleNewInput = (newValue: number) => {
-		if (isNaN(newValue) || newValue < parseFloat(minPrice)) setInputValue(parseFloat(minPrice))
-		else setInputValue(newValue)
-	}
+    
 
 	useEffect(() => setInputValue(parseFloat(minPrice)) , [minPrice])
 
@@ -83,15 +80,22 @@ export const PlaceBidButton = () => {
         reRenderSidePanel()
     }
 
+
+    const validateBid = async (): Promise<E.Either<string, void>> => {
+        if (!(await getIsRightChainId()))        return E.left('Connect to ethereum!')
+        if (getIsVipId() && !(await getIsVip())) return E.left('Not a VIP!')
+        if (isNaN(inputValue))                   return E.left('Input a bid!')
+        if (inputValue < parseFloat(minPrice))   return E.left(`Minimum bid: ${minPrice}`)
+
+        return E.right(constVoid())
+    }
+
 	const handleBidConfirmation = async () => {
         
-        if(!(await getIsRightChainId())) {
-            toast.error('Connect to ethereum!')
-            return
-        }
-
-        if(getIsVipId() && !(await getIsVip())) {
-            toast.error('Not a VIP!')
+        const computation = await validateBid()
+        
+        if (E.isLeft(computation)) {
+            toast.error(computation.left)
             return
         }
 
@@ -146,8 +150,8 @@ export const PlaceBidButton = () => {
 					type="number"
 					placeholder={minPrice}
 					min={minPrice}
-					step='0.025' // FIXME This shouldn't be hardcoded
-					onChange={(event) => handleNewInput(parseFloat(event.target.value))}
+					step='0.025' // FIXME This shouldn't be hardcoded.
+					onChange={(event) => setInputValue(parseFloat(event.target.value))}
 					value={inputValue}
 				/>
 				<div>

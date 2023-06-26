@@ -249,7 +249,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         useLineTimersStore.getState().setCallbackIfDoesntExist(        
             get()._onLineTimerEndDo 
         )
-        
+
         // Setting all timers.
         pipe(
             get().lines,
@@ -398,7 +398,6 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         await get().updateLine(index)
         if (index === get().currentLineIndex)
             reRenderSidePanelObserver.getState().notifyObservers()
-        
     }
 
 }})
