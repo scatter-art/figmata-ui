@@ -33,3 +33,4 @@ export const formatOptAddr = (
 export const fromWei = (x: BigNumberish | bigint) => ethers.formatUnits(x, 'ether')
 export const toWei = (x: number) => ethers.parseEther(x.toString())
 
+export const ZERO_ADDR = `0x${'0'.repeat(40)}`

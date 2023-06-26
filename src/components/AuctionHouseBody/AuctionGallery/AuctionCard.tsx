@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import style from './AuctionCard.module.css'
 import * as O from 'fp-ts/Option'
 import { pipe } from 'fp-ts/lib/function'
 import { useParallelAuctionState } from '../../../state/autoAuctionStore'
 import { hideSidePanelObserver, showSidePanelObserver } from '../../../state/observerStore'
-import { fromWei } from '../../../utils/web3'
+import { fromWei, ZERO_ADDR } from '../../../utils/web3'
 import { sleep } from '../../../utils/pure'
 import Countdown from 'react-countdown'
 import { VipBadgeSvg } from './VipBadgeSvg'
+import { useUserStore } from '../../../state/userStore'
 
 interface AuctionCardProps {
     lineIndex: number
@@ -21,6 +22,40 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
     const imageUrl               = useParallelAuctionState(s => s.getImage(lineIndex))
     const isVip                  = useParallelAuctionState(s => s.getLineIsVip(line))
 
+
+    /* ---------------- WINNING BADGE HANDLING ---------------- */
+    const userAddress = useUserStore(s => s.userAddress)
+    
+    const isUserWinning = pipe(
+        O.Do,
+        O.bind('userAddr', () => userAddress),
+        O.bind('winner', () => pipe(line, O.map(l => l.currentWinner))),
+        O.exists(({ userAddr, winner }) => userAddr === winner)
+    )
+
+    const [userHasWonAnyTime, setUserHasWonAnyTime] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (isUserWinning) setUserHasWonAnyTime(true)
+    }, [isUserWinning])
+
+    useEffect(() => {
+        const newAuction = pipe(
+            line,
+            O.exists(l => l.currentWinner.toString() === ZERO_ADDR)
+        )
+        // If the auction changed then remove the badge!
+        if (newAuction) setUserHasWonAnyTime(false)
+    }, [line])
+
+    const auctionStatusText = isUserWinning
+        ? 'YOU ARE WINNING!'
+        : userHasWonAnyTime 
+            ? 'YOU GOT OUTBIDDED!'
+            : ''
+   
+
+    /* ---------------- AUCTION DATA MANIPULATION ---------------- */
     const hideSidePanel = hideSidePanelObserver(s => s.notifyObservers)
     const showSidePanel = showSidePanelObserver(s => s.notifyObservers)
 
@@ -50,7 +85,16 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
     }
 
     return (
-        <div className={style['auction-card']} onClick={onCardClick} data-is-vip={isVip}>
+        <div 
+            className={style['auction-card']}
+            onClick={onCardClick}
+            data-is-vip={isVip}
+            data-is-winning={isUserWinning || userHasWonAnyTime}
+        >
+            <div className={style['user-winning-string-container']}>
+                <span>{auctionStatusText}</span>
+            </div>
+
             <div className={style['thumbnail-container']}>
                 <span className={style['vip-string']}>VIP</span>
 
