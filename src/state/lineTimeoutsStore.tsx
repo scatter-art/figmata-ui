@@ -3,8 +3,13 @@ import * as O from 'fp-ts/Option'
 import { pipe } from 'fp-ts/lib/function'
 import { LineStateStruct } from '../types/IHoldsParallelAutoAuctionData'
 import { msTimeLeft } from '../utils/pure'
-import { ethers } from 'ethers'
+import { BigNumberish, ethers } from 'ethers'
 import {  useParallelAuctionState } from './autoAuctionStore'
+
+
+// Max 1s timer to prevent infinite loops on auction ends.
+const minMsTimeLeft = (x: BigNumberish) =>
+    Math.max(1000, msTimeLeft(ethers.toNumber(x)))
 
 type LineTimeoutStoreState = {
 
@@ -46,12 +51,12 @@ export const useLineTimersStore = create<LineTimeoutStoreState>((set, get) => {r
             get().timers[index],
             O.map(clearTimeout)
         )
-        
+
         // Set callback if it exists.
         pipe(
             get().onTimerEndCallback,
             O.map(f => () => f(index)),
-            O.map(f => setTimeout(f, msTimeLeft(ethers.toNumber(line.endTime)))),
+            O.map(f => setTimeout(f, minMsTimeLeft(line.endTime))),
             O.map(t => set(({ timers }) => {
                 timers[index] = O.of(t)
                 return { timers }
