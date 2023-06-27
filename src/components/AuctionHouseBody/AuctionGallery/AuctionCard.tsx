@@ -34,7 +34,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
             case 'userHasToClaim': return 'BID TO CLAIM!'
         }}
     )(lineStatus)
-    
+
 
     /* ---------------- AUCTION DATA MANIPULATION ---------------- */
     const hideSidePanel = hideSidePanelObserver(s => s.notifyObservers)

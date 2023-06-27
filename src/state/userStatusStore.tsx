@@ -14,15 +14,16 @@ const setAdd = S.insert(Str.Eq)
 
 type UserStatusStoreState = {
 
+    // NOTE Those 2 sets could be queried for all ids for perfect UX
+    // across instances. It would be convenient to have a microservice
+    // for storing those and other immutable states (once the user
+    // wins an id `n` its immutable that `n in winningIds` and 
+    // `n not in outbiddedIds`.
     winningIds: Set<string>,
-
     outbiddedIds: Set<string>,
     
     getUserIsWinningLine: (line: LineStateStruct) => boolean,
-
     getUserGotOutbiddedForLine: (line: LineStateStruct) => boolean,
-
-    
     /**
      * @returns If the user still needs to claim a line. Of course, it
      * will only be true if he won that line.
@@ -41,6 +42,7 @@ type UserStatusStoreState = {
 }
 
 export const useUserStatusStore = create<UserStatusStoreState>((set, get) => {return {
+
     winningIds: new Set(),
     outbiddedIds: new Set(),
 
@@ -78,7 +80,6 @@ export const useUserStatusStore = create<UserStatusStoreState>((set, get) => {re
     },
 
     getUserHasToClaimLine: line => {
-        
         // If it was already claimed return false.
         if (line.currentWinner.toString() !== ZERO_ADDR) return false
         
@@ -93,9 +94,9 @@ export const useUserStatusStore = create<UserStatusStoreState>((set, get) => {re
 
 
     /* -------- Opt Wrappers --------*/
-    getOptUserIsWinningLine:       l => pipe(l, O.exists(get().getUserIsWinningLine)),
-    getOptUserGotOutbiddedForLine: l => pipe(l, O.exists(get().getUserIsWinningLine)),
-    getOptUserHasToClaimLine:      l => pipe(l, O.exists(get().getUserIsWinningLine)),
+    getOptUserIsWinningLine:       l => O.exists(get().getUserIsWinningLine)(l),
+    getOptUserGotOutbiddedForLine: l => O.exists(get().getUserGotOutbiddedForLine)(l),
+    getOptUserHasToClaimLine:      l => O.exists(get().getUserHasToClaimLine)(l),
 
     /* -------- State enum return --------*/
     getUserLineStatus: l => {
