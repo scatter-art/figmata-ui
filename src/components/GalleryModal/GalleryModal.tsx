@@ -46,11 +46,11 @@ export const GalleryModal: React.FC = () => {
 
                 <div className={style['body']}>
                     {/* TODO: Currently hardcoded sample tiles need to be rendered dynamically here */}
-                    <GalleryModalTile />
-                    <GalleryModalTile />
-                    <GalleryModalTile />
-                    <GalleryModalTile />
-                    <GalleryModalTile />
+                    <GalleryModalTile id={1}/>
+                    <GalleryModalTile id={2}/>
+                    <GalleryModalTile id={3}/>
+                    <GalleryModalTile id={4}/>
+                    <GalleryModalTile id={5}/>
                 </div>
             </div>
         </>

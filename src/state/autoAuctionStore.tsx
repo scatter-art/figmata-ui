@@ -30,6 +30,12 @@ export const vipIds = [
 // uglier.
 export const auctionsAtTheSameTime = 10
 
+export type WonEvent = {
+    readonly id: BigNumberish,
+    readonly winner: string,
+    readonly price: BigNumberish
+}
+
 type ParallelAuctionData = {
     readonly auctionAddress: string,
     readonly auctionContract: IParallelAutoAuction,
@@ -94,11 +100,17 @@ type ParallelAuctionStoreState = {
     
     /* ------------- GENERAL CONTRACT QUERIES ------------- */
 
+    getImagesUri: () => O.Option<string>,
+
     getImage: (forLineIndex: number) => string,
+
+    getImageForId: (id: BigNumberish) => string,
 
     getCollectionName: () => O.Option<string>,
 
     getFormattedTokenName: (forLineIndex: number) => string,
+
+    getFormattedTokenNameFoId: (id: BigNumberish) => string,
 
     getAuctionConfig: () => O.Option<AuctionConfigStruct>,
     
@@ -125,6 +137,7 @@ type ParallelAuctionStoreState = {
      */
     getLineIsVip: (line: O.Option<LineStateStruct>) => boolean,
 
+    getContractWonEventFor: (id: BigNumberish) => Promise<O.Option<WonEvent>>
     
     /* --------------- CALLBACK FUNCTIONS --------------- */
     /**
@@ -296,11 +309,22 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         return newLine
     },
     
-    getImage: (forLineIndex: number) => pipe(
-        O.Do,
-        O.bind('line', () => get().getLine(forLineIndex)),
-        O.bind('uri', () => pipe(get().auctionData, O.map(d => d.tokenImagesUri))),
-        O.map(({ line, uri }) => `${uri}/${line.head}.png`),
+
+    getImagesUri: () => pipe(
+        get().auctionData,
+        O.map(d => d.tokenImagesUri)
+    ),
+
+    getImage: lineIndex => pipe(
+        get().getLine(lineIndex),
+        O.map(l => l.head),
+        O.map(get().getImageForId),
+        O.getOrElse(() => '/404.png')
+    ),
+
+    getImageForId: id => pipe(
+        get().getImagesUri(),
+        O.map(uri => `${uri}/${id}.png`),
         O.getOrElse(() => '/404.png')
     ),
     
@@ -309,11 +333,16 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.map(data => data.tokenName)
     ),
 
-    getFormattedTokenName: (forLineIndex: number) => pipe(
-        O.Do,
-        O.bind('name', get().getCollectionName),
-        O.bind('line', () => get().getLine(forLineIndex)),
-        O.map(({ name, line }) => `${name} #${line.head}`),
+    getFormattedTokenName: lineIndex => pipe(
+        get().getLine(lineIndex),
+        O.map(l => l.head),
+        O.map(get().getFormattedTokenNameFoId),
+        O.getOrElse(PROVIDER_DOWN_MESSAGE)
+    ),
+
+    getFormattedTokenNameFoId: id => pipe(
+        get().getCollectionName(),
+        O.map(name => `${name} #${id}`),
         O.getOrElse(PROVIDER_DOWN_MESSAGE)
     ),
 
@@ -381,6 +410,22 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.map(l => l.head),
         O.exists(i => vipIds.includes(Number(i)))
     ),
+
+    getContractWonEventFor: async (id) => {
+        const auctionDataOpt = get().auctionData
+        if (O.isNone(auctionDataOpt)) return O.none
+        const auctionData = auctionDataOpt.value
+
+        const winsFilter = auctionData.auctionContract.filters.Won(id)
+        
+        const rawEvents = await auctionData.auctionContract.queryFilter(winsFilter)
+
+        const event: WonEvent = rawEvents.map(e => ({
+            id: e.args[0], winner: e.args[1], price: e.args[2]
+        }))[0]
+
+        return O.some(event)
+    },
 
     /* --------------- CALLBACK FUNCTIONS --------------- */
     _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => pipe(
