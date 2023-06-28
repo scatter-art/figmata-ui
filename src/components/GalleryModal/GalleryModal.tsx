@@ -1,40 +1,26 @@
+import * as O from 'fp-ts/Option'
 import React, {useState, useEffect} from "react";
 import { useGalleryStore } from "../../state/galleryStore";
 import style from './GalleryModal.module.css'
-import * as O from 'fp-ts/Option'
 import { GalleryModalTile } from "./GalleryModalTile/GalleryModalTile";
 
 export const GalleryModal: React.FC = () => {
-    const [isVisible, setIsVisible] = useState(false);
 
     const ids = useGalleryStore(s => s.getAllWonIds)()
-    console.log(ids)
 
-    const openModal = () => {
-        setIsVisible(true);
-    };
-
-    const closeModal = () => {
-        setIsVisible(false);
-    };
+    const [isVisible, setIsVisible] = useState(false);
+    const openModal = () => setIsVisible(true)
+    const closeModal = () => setIsVisible(false)
 
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                closeModal()
-            }
+            if (event.key === 'Escape') closeModal()
         }
 
-        if (isVisible) {
-            window.addEventListener("keydown", handleEsc)
-        } else {
-            window.removeEventListener("keydown", handleEsc)
-        }
+        if (isVisible) window.addEventListener("keydown", handleEsc)
+        else window.removeEventListener("keydown", handleEsc)
 
-        return () => {
-            window.removeEventListener("keydown", handleEsc)
-        }
-
+        return () => window.removeEventListener("keydown", handleEsc)
     }, [isVisible])
 
     return <>
@@ -50,15 +36,11 @@ export const GalleryModal: React.FC = () => {
             </div>
 
             <div className={style['body']}>
-                {/*O.isSome(ids) ? ids.value.map(id => 
-                    <GalleryModalTile id={id}  /> 
+                {O.isSome(ids) ? ids.value.slice(0, 4).map(id => 
+                    <GalleryModalTile id={id} key={id}/> 
                 ) :  
                     <span style={{color: 'gray', fontSize: '32px'}}>Loading...</span>
-                */}
-                <GalleryModalTile id={7}/>
-                {/*<GalleryModalTile id={3}/>
-                <GalleryModalTile id={4}/>
-                <GalleryModalTile id={5}/>*/}
+                }
             </div>
         </div>
     </>

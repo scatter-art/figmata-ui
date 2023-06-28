@@ -6,10 +6,17 @@ import * as RA from 'fp-ts/ReadonlyArray'
 import * as N from 'fp-ts/number'
 import * as Ord from 'fp-ts/Ord'
 import { create } from 'zustand'
-import { auctionsAtTheSameTime, BidEvent, PROVIDER_DOWN_MESSAGE, useParallelAuctionState, WonEvent } from './autoAuctionStore'
+import { 
+    auctionsAtTheSameTime,
+    BidEvent,
+    PROVIDER_DOWN_MESSAGE,
+    useParallelAuctionState,
+    WonEvent
+} from './autoAuctionStore'
 import { pipe } from 'fp-ts/lib/function'
-import { formatAddr, fromWei } from '../utils/web3'
+import { formatAddr, fromWei, ZERO_ADDR } from '../utils/web3'
 import { ethers } from 'ethers'
+import { fplog } from '../utils/pure'
 
 
 type GalleryData = WonEvent & {
@@ -108,7 +115,7 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
 
 
     _updateGalleryCardData: async (id) => {
-        
+
         // If the data is already available, return it.
         const storedData = get().galleryCards.get(id)
         if (storedData) return O.some(storedData)
@@ -118,12 +125,12 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
             useParallelAuctionState.getState().getLineFromId(id),
             O.exists(l => l.head < id)
         )) return O.none
-
+        
         // Query all events needed to compute the auction data.
         const wonEventOpt = O.flatten(await pipe(
             TO.tryCatch(() => useParallelAuctionState.getState().getContractWonEventFor(id)),
         )())
-    
+        
         const bidEvents = O.flatten(await pipe(
             TO.tryCatch(() => useParallelAuctionState.getState().getContractBidEventFor(id))
         )())
@@ -146,7 +153,7 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
             A.map(ethers.getBigInt),
             A.reduce(BigInt(0), (a,v) => v + a),
         )
-        
+
         // The auction could not have been settled, thats why we use
         // the `Bid` event to decide the winner. Note that this works
         // because of the second condition in this procedure.
@@ -154,13 +161,13 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
             ? wonEventOpt
             : pipe(
                 bidEvents.value,
-                A.reduce({price: BigInt(0)} as BidEvent, Ord.max(getCurrentWinnerOrdering)),
+                A.reduce(
+                    {price: BigInt(-1), id: BigInt(id), bidder: ZERO_ADDR} as BidEvent,
+                    Ord.max(getCurrentWinnerOrdering)
+                ),
                 event => O.of({ ...event, winner: event.bidder })
             )
         
-        console.log('res event:')
-        console.log(wonEvent)
-
         const galleryData = pipe(
             wonEvent,
             O.map(x => ({...x, totalBids, totalBiddedAmount })),

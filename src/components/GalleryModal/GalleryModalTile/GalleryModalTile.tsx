@@ -16,11 +16,10 @@ export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
     const imageUrl  = useParallelAuctionState(s => s.getImageForId(id))
     const tokenName = useParallelAuctionState(s => s.getFormattedTokenNameFoId(id))
     const data      = useGalleryStore(s => s.getGalleryCardDataFor(id))
-    console.log(data)
 
     const winner      = pipe(data, O.map(d => d.winner), O.getOrElse(PROVIDER_DOWN_MESSAGE))
     const hammerPrice = pipe(data, O.map(d => d.price), O.getOrElse(PROVIDER_DOWN_MESSAGE))
-    const totalBids   = '12' // TODO
+    const totalBids   = pipe(data, O.map(d => d.totalBids), O.getOrElse(() => 0))
 
     const etherscanUrl = '' // TODO
     const openSeaUrl = '' // TODO
