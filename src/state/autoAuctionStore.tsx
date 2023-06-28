@@ -30,10 +30,17 @@ export const vipIds = [
 // uglier.
 export const auctionsAtTheSameTime = 10
 
+// FIXME Those types shouln't be hardcoded.
 export type WonEvent = {
-    readonly id: BigNumberish,
+    readonly id: bigint,
     readonly winner: string,
-    readonly price: BigNumberish
+    readonly price: bigint 
+}
+
+export type BidEvent = {
+    readonly id: bigint,
+    readonly bidder: string,
+    readonly price: bigint 
 }
 
 type ParallelAuctionData = {
@@ -73,6 +80,12 @@ type ParallelAuctionStoreState = {
      * None iff `index` is not valid.
      */
     getLine: (index: number) => O.Option<LineStateStruct>,
+
+    /**
+     * @returns The line for `id`.
+     * None if its a wrong id.
+     */
+    getLineFromId: (id: number) => O.Option<LineStateStruct>,
 
     /**
      * @returns The selected line based on `currentLineIndex`.
@@ -140,6 +153,8 @@ type ParallelAuctionStoreState = {
     getLineIsVip: (line: O.Option<LineStateStruct>) => boolean,
 
     getContractWonEventFor: (id: BigNumberish) => Promise<O.Option<WonEvent>>
+
+    getContractBidEventFor: (id: BigNumberish) => Promise<O.Option<BidEvent[]>>
     
     /* --------------- CALLBACK FUNCTIONS --------------- */
     /**
@@ -162,10 +177,13 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
     currentLineIndex: 0,
     lines: O.none,
 
-    getLine: (index: number) => pipe(
+    getLine: index => pipe(
         get().lines,
-        O.flatMap(lines => lines[index])
+        O.flatMap(lines => O.fromNullable(lines[index])),
+        O.flatten
     ),
+
+    getLineFromId: id => get().getLine((id - 1) % 10),
 
     getCurrentSelectedLine: () => get().getLine(get().currentLineIndex),
 
@@ -436,6 +454,28 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
                 id: e.args[0], winner: e.args[1], price: e.args[2]
             }))
         )
+    },
+
+    getContractBidEventFor: async (id) => {
+
+        const auctionDataOpt = get().auctionData
+        if (O.isNone(auctionDataOpt)) return O.none
+        const auctionData = auctionDataOpt.value
+
+        const bidsFilter = auctionData.auctionContract.filters.Bid(id)
+        const rawEvents = await auctionData.auctionContract.queryFilter(bidsFilter)
+
+        const eventsOpts = pipe(
+            rawEvents,
+            A.map(e => O.fromNullable(({
+                id: e.args[0], bidder: e.args[1], price: e.args[2]
+            }))),
+        )
+        
+        return A.every(O.isSome)(eventsOpts)
+            ? O.some(eventsOpts.map(e => e.value))
+            : O.none
+
     },
 
     /* --------------- CALLBACK FUNCTIONS --------------- */
