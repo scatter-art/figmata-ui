@@ -95,6 +95,18 @@ export type UnOptionMap<T> = {
     T[K];
 };
 
+export function fplog <T>(
+    d: string | ((y: T) => void)
+): (x: T) => T {
+    if (typeof d === 'string') {
+        console.log(d)
+        return identity
+    }
+    return (x: T) => { 
+        d(x); return x
+    }
+};
+
 export const TO2 = {
     flatTry
 };

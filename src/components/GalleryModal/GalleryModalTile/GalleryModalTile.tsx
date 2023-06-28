@@ -1,24 +1,28 @@
 import React from "react";
-import { useParallelAuctionState } from "../../../state/autoAuctionStore";
-import { useGalleryStore } from "../../../state/galleryStore";
+import * as O from 'fp-ts/Option'
+import { PROVIDER_DOWN_MESSAGE, useParallelAuctionState } from "../../../state/autoAuctionStore";
 import { EtherscanSvg } from "../../Svgs/EtherscanSvg";
 import { OpenseaSvg } from "../../Svgs/OpenseaSvg";
 import style from './GalleryModalTile.module.css'
+import { useGalleryStore } from "../../../state/galleryStore";
+import { pipe } from "fp-ts/lib/function";
 
 export type GalleryModalTileProps = {
     id: number
 }
 
 export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
-    const imageUrl = useParallelAuctionState(s => s.getImageForId(id))
-    const tokenName = useParallelAuctionState(s => s.getFormattedTokenNameFoId(id))
-    //const d = useGalleryStore(s => s.getGalleryCardDataFor)(id)
 
-    const winner = 'savethefrogs.eth'
-    const hammerPrice = '1.25'
-    const totalBids = '12'
-    const etherscanUrl = ''
-    const openSeaUrl = ''
+    const imageUrl  = useParallelAuctionState(s => s.getImageForId(id))
+    const tokenName = useParallelAuctionState(s => s.getFormattedTokenNameFoId(id))
+    const data      = useGalleryStore(s => s.getGalleryCardDataFor(id))
+
+    const winner      = pipe(data, O.map(d => d.winner), O.getOrElse(PROVIDER_DOWN_MESSAGE))
+    const hammerPrice = pipe(data, O.map(d => d.price), O.getOrElse(PROVIDER_DOWN_MESSAGE))
+    const totalBids   = '12' // TODO
+
+    const etherscanUrl = '' // TODO
+    const openSeaUrl = '' // TODO
 
     return (
         <div className={style['gallery-modal-tile-container']}>

@@ -1,9 +1,12 @@
 import React, {useState, useEffect} from "react";
+import { useGalleryStore } from "../../state/galleryStore";
 import style from './GalleryModal.module.css'
 import { GalleryModalTile } from "./GalleryModalTile/GalleryModalTile";
 
 export const GalleryModal: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
+
+    const ids = useGalleryStore(s => s.getAllWonIds)()
 
     const openModal = () => {
         setIsVisible(true);

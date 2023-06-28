@@ -120,6 +120,8 @@ type ParallelAuctionStoreState = {
 
     getFormattedCurrentWinner: (forLineIndex: number) => string,
 
+    getCurrentlyAuctionedIds: () => Promise<O.Option<number[]>>,
+
     createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
 
     /**
@@ -367,6 +369,14 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.flatMap(line => formatAddr(line.currentWinner.toString(), 11)),
         O.getOrElse(PROVIDER_DOWN_MESSAGE)
     ),
+
+    getCurrentlyAuctionedIds: async () => await pipe(
+        get().auctionData,
+        O.map(d => d.auctionContract),
+        TO.fromOption,
+        TO2.flatTry(x => x.getIdsToAuction()),
+        TO.map(A.map(Number))
+    )(),
     
     // TODO This solution is ugly af, can't I use the user wallet for
     // signing and querying at the same time?
@@ -420,11 +430,12 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         
         const rawEvents = await auctionData.auctionContract.queryFilter(winsFilter)
 
-        const event: WonEvent = rawEvents.map(e => ({
-            id: e.args[0], winner: e.args[1], price: e.args[2]
-        }))[0]
-
-        return O.some(event)
+        return pipe(
+            rawEvents[0],
+            e => O.fromNullable(({
+                id: e.args[0], winner: e.args[1], price: e.args[2]
+            }))
+        )
     },
 
     /* --------------- CALLBACK FUNCTIONS --------------- */
