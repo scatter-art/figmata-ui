@@ -8,10 +8,18 @@ const itemsToShowPerLoad = 6
 
 export const GalleryModal: React.FC = () => {
 
-    const ids = useGalleryStore(s => s.getAllWonIds)()
+    const loadIds = useGalleryStore(s => s.getAllWonIds)
+    const ids = useGalleryStore(s => s.wonIds)
+
+    // NOTE This function could be used to change the ids order from
+    // ascending to descending.
+    //const swap = useGalleryStore(s => s.reverseGallery)
 
     const [isVisible, setIsVisible] = useState(false);
-    const openModal = () => setIsVisible(true)
+    const openModal = () => {
+        if (O.isNone(ids)) loadIds()
+        setIsVisible(true)
+    }
     const closeModal = () => setIsVisible(false)
 
     const [visibleItems, setVisibleItems] = useState<number>(itemsToShowPerLoad)

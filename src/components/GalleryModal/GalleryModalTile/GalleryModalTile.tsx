@@ -1,6 +1,6 @@
 import React from "react";
 import * as O from 'fp-ts/Option'
-import { PROVIDER_DOWN_MESSAGE, useParallelAuctionState } from "../../../state/autoAuctionStore";
+import { useParallelAuctionState } from "../../../state/autoAuctionStore";
 import { EtherscanSvg } from "../../Svgs/EtherscanSvg";
 import { OpenseaSvg } from "../../Svgs/OpenseaSvg";
 import style from './GalleryModalTile.module.css'
@@ -11,6 +11,10 @@ export type GalleryModalTileProps = {
     id: number
 }
 
+// FIXME Hardcode for the lulz.
+const tokenEtherscanUrl = 'https://etherscan.io/token/0xe61443f7db3ca8b7fc083602dcc52726db3d5ff6?a='
+const tokenOpenseaUrl = 'https://opensea.io/assets/ethereum/0xe61443f7db3ca8b7fc083602dcc52726db3d5ff6/'
+
 export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
 
     const imageUrl  = useParallelAuctionState(s => s.getImageForId(id))
@@ -20,9 +24,6 @@ export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
     const winner      = pipe(data, O.map(d => d.winner), O.getOrElse(() => 'Loading'))
     const hammerPrice = pipe(data, O.map(d => d.price), O.getOrElse(() => 'Loading'))
     const totalBids   = pipe(data, O.map(d => d.totalBids), O.getOrElse(() => 0))
-
-    const etherscanUrl = '' // TODO
-    const openSeaUrl = '' // TODO
 
     return (
         <div className={style['gallery-modal-tile-container']}>
@@ -48,11 +49,11 @@ export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
                 </div>
 
                 <div className={style['aux']}>
-                    <a href={etherscanUrl}  target="_blank" rel="noopener noreferrer">
+                    <a href={`${tokenEtherscanUrl}${id}`}  target="_blank" rel="noopener noreferrer">
                         <EtherscanSvg />
                     </a>
 
-                    <a href={openSeaUrl} target="_blank" rel="noopener noreferrer">
+                    <a href={`${tokenOpenseaUrl}${id}`} target="_blank" rel="noopener noreferrer">
                         <OpenseaSvg />
                     </a>
                 </div>

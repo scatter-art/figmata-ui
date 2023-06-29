@@ -1,4 +1,5 @@
 import * as O from 'fp-ts/Option'
+import * as E from 'fp-ts/Either'
 import * as TO from 'fp-ts/TaskOption'
 import * as A from 'fp-ts/Array'
 import * as RNEA from 'fp-ts/ReadonlyNonEmptyArray'
@@ -17,6 +18,7 @@ import { pipe } from 'fp-ts/lib/function'
 import { formatAddr, fromWei, ZERO_ADDR } from '../utils/web3'
 import { ethers } from 'ethers'
 import { Mutex } from 'async-mutex'
+import { fplog } from '../utils/pure'
 
 type GalleryData = WonEvent & {
     readonly totalBids: number,
@@ -71,6 +73,13 @@ type GalleryStoreState = {
 
     getAllWonIds: () => O.Option<readonly number[]>,
 
+    /**
+     * @dev Tries to reverse `wonIds` if theyre present and returns
+     * the updated list.
+     * @returns E.left If `wonIds` are not present.
+     */
+    reverseGallery: () => E.Either<string, readonly number[]>,
+
     formatGalleryData: (event: GalleryData) => FormattedGalleryData,
 
 
@@ -110,6 +119,14 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
         get()._updateWonIds()
         return get().wonIds
     },
+
+    reverseGallery: () => pipe( 
+        get().wonIds,
+        fplog('hi'),
+        O.map(x => RA.reverse(x)),
+        E.fromOption(() => 'the gallery is not present'),
+        E.map(x => {set({ wonIds: O.of(x) }); return x})
+    ),
         
     formatGalleryData: e => ({
         ...e,
