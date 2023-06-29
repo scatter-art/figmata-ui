@@ -4,6 +4,8 @@ import { useGalleryStore } from "../../state/galleryStore";
 import style from './GalleryModal.module.css'
 import { GalleryModalTile } from "./GalleryModalTile/GalleryModalTile";
 
+const itemsToShowPerLoad = 6
+
 export const GalleryModal: React.FC = () => {
 
     const ids = useGalleryStore(s => s.getAllWonIds)()
@@ -11,6 +13,8 @@ export const GalleryModal: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     const openModal = () => setIsVisible(true)
     const closeModal = () => setIsVisible(false)
+
+    const [visibleItems, setVisibleItems] = useState<number>(itemsToShowPerLoad)
 
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
@@ -22,6 +26,12 @@ export const GalleryModal: React.FC = () => {
 
         return () => window.removeEventListener("keydown", handleEsc)
     }, [isVisible])
+
+    const handleLoadMore = () => {
+        if (O.isSome(ids)) setVisibleItems(
+            current => Math.min(current + itemsToShowPerLoad, ids.value.length)
+        )
+    }
 
     return <>
         <div id={style['gallery-button-container']}>
@@ -36,12 +46,19 @@ export const GalleryModal: React.FC = () => {
             </div>
 
             <div className={style['body']}>
-                {O.isSome(ids) ? ids.value.slice(0, 4).map(id => 
+                {O.isSome(ids) ? ids.value.slice(0, visibleItems).map(id => 
                     <GalleryModalTile id={id} key={id}/> 
                 ) :  
                     <span style={{color: 'gray', fontSize: '32px'}}>Loading...</span>
                 }
             </div>
+
+            {O.isSome(ids) && visibleItems < ids.value.length && (
+                <button 
+                    onClick={handleLoadMore}
+                    id={style['load-more-button']}
+                >Load More</button>
+            )}
         </div>
     </>
 }

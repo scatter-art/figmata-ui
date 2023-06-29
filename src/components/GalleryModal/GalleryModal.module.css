@@ -119,3 +119,26 @@
         grid-template-columns: repeat(1, 1fr);
     }
 }
+
+/* LOAD MORE BUTTON ----------------------- */
+
+#load-more-button {
+    width: auto;
+    margin: 10px auto;
+    padding: 10px 20px;
+	height: var(--sp-4);
+	border-style: none;
+	border: 1px solid transparent;
+	border-radius: var(--sp-1);
+	background-color: var(--clr-surface);
+	font-family: var(--font-pixel);
+	font-size: 0.675rem;
+	box-shadow: var(--ev-neu-inner-action);
+	cursor: pointer;
+}
+
+
+#load-more-button:hover {
+	border: 1px solid var(--clr-accent);
+	transition: 250ms;
+}

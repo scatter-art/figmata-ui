@@ -16,8 +16,7 @@ import {
 import { pipe } from 'fp-ts/lib/function'
 import { formatAddr, fromWei, ZERO_ADDR } from '../utils/web3'
 import { ethers } from 'ethers'
-import { fplog } from '../utils/pure'
-
+import { Mutex } from 'async-mutex'
 
 type GalleryData = WonEvent & {
     readonly totalBids: number,
@@ -44,6 +43,8 @@ const getCurrentWinnerOrdering: Ord.Ord<BidEvent> = pipe(
     ordBigInt,
     Ord.contramap(x => ethers.getBigInt(x.price))
 )
+
+const testMutex = new Mutex()
 
 
 type GalleryStoreState = {
@@ -80,6 +81,11 @@ type GalleryStoreState = {
      *                   If some dependency is not available.
      */
     _updateGalleryCardData: (id: number) => Promise<O.Option<FormattedGalleryData>>,
+
+    /**
+     * @dev Performs like `_updateGalleryCardData` but without a mutex.
+     */
+    _unsafeUpdateGalleryCardData: (id: number) => Promise<O.Option<FormattedGalleryData>>,
         
     /**
      * @returns `O.none` if the ids didn't get updated, 
@@ -114,11 +120,17 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
     }),
 
 
-    _updateGalleryCardData: async (id) => {
+    // TODO This could get further optimized if you had a mutex for
+    // each galler card, so they run independently.
+    _updateGalleryCardData: async (id) => await testMutex.runExclusive(() => 
+        get()._unsafeUpdateGalleryCardData(id)
+    ),
 
+    _unsafeUpdateGalleryCardData: async (id) => {
         // If the data is already available, return it.
         const storedData = get().galleryCards.get(id)
         if (storedData) return O.some(storedData)
+        console.log('Running...')
 
         // If the data shouldn't be available, return none.
         if (pipe(
