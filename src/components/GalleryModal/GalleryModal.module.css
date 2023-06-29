@@ -135,8 +135,23 @@
 	font-size: 0.675rem;
 	box-shadow: var(--ev-neu-inner-action);
 	cursor: pointer;
+
+    justify-self: center;
+    align-self: center;
+    grid-column: 1 / span 2;
 }
 
+@media screen and (min-width: 1921px) {
+    #load-more-button {
+        grid-column: 1 / span 3;
+    }
+}
+
+@media screen and (max-width: 1080px) {
+    #load-more-button {
+        grid-column: 1 / span 1;
+    }
+}
 
 #load-more-button:hover {
 	border: 1px solid var(--clr-accent);

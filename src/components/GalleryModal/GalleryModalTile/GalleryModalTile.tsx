@@ -14,10 +14,12 @@ export type GalleryModalTileProps = {
 // FIXME Hardcode for the lulz.
 const tokenEtherscanUrl = 'https://etherscan.io/token/0xe61443f7db3ca8b7fc083602dcc52726db3d5ff6?a='
 const tokenOpenseaUrl = 'https://opensea.io/assets/ethereum/0xe61443f7db3ca8b7fc083602dcc52726db3d5ff6/'
+const ipfsGateway = 'https://ipfs.io/ipfs/bafybeiam3hfazboofhhid2azc2qi4oksapfhtbdz6mls7lonc5lf62yeaa/'
 
 export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
 
-    const imageUrl  = useParallelAuctionState(s => s.getImageForId(id))
+    //const imageUrl  = useParallelAuctionState(s => s.getImageForId(id))
+    const imageUrl = `${ipfsGateway}${id}.png`
     const tokenName = useParallelAuctionState(s => s.getFormattedTokenNameFoId(id))
     const data      = useGalleryStore(s => s.getGalleryCardDataFor(id))
 
@@ -28,7 +30,7 @@ export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
     return (
         <div className={style['gallery-modal-tile-container']}>
             <div className={style['thumb']}>
-                <img src={imageUrl} alt={tokenName}/>
+                <img src={O.isSome(data) ? imageUrl : '/404.png'} alt={tokenName}/>
             </div>
 
             <div className={style['body']}>

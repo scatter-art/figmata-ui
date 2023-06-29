@@ -18,7 +18,6 @@ import { pipe } from 'fp-ts/lib/function'
 import { formatAddr, fromWei, ZERO_ADDR } from '../utils/web3'
 import { ethers } from 'ethers'
 import { Mutex } from 'async-mutex'
-import { fplog } from '../utils/pure'
 
 type GalleryData = WonEvent & {
     readonly totalBids: number,
@@ -38,7 +37,7 @@ type FormattedGalleryData = FormattedWonEvent & {
 
 
 const ordBigInt: Ord.Ord<bigint> = Ord.fromCompare((x,y) =>
-    x < y ? -1 : y > y ? 1 : 0
+    x < y ? -1 : x > y ? 1 : 0
 )
 
 const getCurrentWinnerOrdering: Ord.Ord<BidEvent> = pipe(
@@ -122,7 +121,6 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
 
     reverseGallery: () => pipe( 
         get().wonIds,
-        fplog('hi'),
         O.map(x => RA.reverse(x)),
         E.fromOption(() => 'the gallery is not present'),
         E.map(x => {set({ wonIds: O.of(x) }); return x})
@@ -147,7 +145,6 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
         // If the data is already available, return it.
         const storedData = get().galleryCards.get(id)
         if (storedData) return O.some(storedData)
-        console.log('Running...')
 
         // If the data shouldn't be available, return none.
         if (pipe(

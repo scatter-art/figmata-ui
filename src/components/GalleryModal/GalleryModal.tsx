@@ -59,14 +59,15 @@ export const GalleryModal: React.FC = () => {
                 ) :  
                     <span style={{color: 'gray', fontSize: '32px'}}>Loading...</span>
                 }
-            </div>
 
-            {O.isSome(ids) && visibleItems < ids.value.length && (
-                <button 
-                    onClick={handleLoadMore}
-                    id={style['load-more-button']}
-                >Load More</button>
-            )}
+                {O.isSome(ids) && visibleItems < ids.value.length &&
+                    <button 
+                        onClick={handleLoadMore}
+                        id={style['load-more-button']}
+                    >Load More</button>
+                }
+                
+            </div>
         </div>
     </>
 }
