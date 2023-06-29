@@ -478,6 +478,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
 
     },
 
+
     /* --------------- CALLBACK FUNCTIONS --------------- */
     _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => pipe(
         get().getAuctionConfig(),
