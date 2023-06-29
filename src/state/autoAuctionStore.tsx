@@ -22,7 +22,7 @@ import { useLineTimersStore } from './lineTimeoutsStore'
 // Epic hardcodes :3
 export const PROVIDER_DOWN_MESSAGE = () => 'Connect wallet :('
 export const vipIds = [
-    1, 7, 51, 55, 171, 81, 114, 180, 230, 211, 210, 17, 179, 247, 288, 308, 36, 323, 8, 64
+    1, 7, 51, 55, 171, 81, 114, 180, 230, 211, 210, 17, 179, 247, 288, 308, 36, 323, 8, 64, 72
 ]
 // Should I harcode those kinds of states? I think I should abstract
 // this pattern of loading the whole immutable system state, because
