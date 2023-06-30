@@ -26,10 +26,11 @@ export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
     const winner      = pipe(data, O.map(d => d.winner), O.getOrElse(() => 'Loading'))
     const hammerPrice = pipe(data, O.map(d => d.price), O.getOrElse(() => 'Loading'))
     const totalBids   = pipe(data, O.map(d => d.totalBids), O.getOrElse(() => 0))
+    const totalBiddedAmount = pipe(data, O.map(d => d.totalBiddedAmount), O.getOrElse(() => 'Loading'))
 
     return (
         <div className={style['gallery-modal-tile-container']}>
-            <div className={style['thumb']}>
+            <div className={style['thumb']} data-is-ready={O.isSome(data)}>
                 <img src={O.isSome(data) ? imageUrl : '/404.png'} alt={tokenName}/>
             </div>
 
@@ -48,6 +49,11 @@ export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
                 <div className={style['row']}>
                     <span>TOTAL BIDS:</span>
                     <span>{totalBids}</span>
+                </div>
+
+                <div className={style['row']}>
+                    <span>TOTAL BID VOLUME:</span>
+                    <span>{totalBiddedAmount}</span>
                 </div>
 
                 <div className={style['aux']}>

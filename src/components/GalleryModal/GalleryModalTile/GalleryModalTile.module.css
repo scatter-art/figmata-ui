@@ -18,6 +18,7 @@
 /* IMAGE ---------------------------------- */
 .thumb {
     max-width: calc(var(--sp-12) * 2);
+    position: relative;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -37,6 +38,64 @@
     width: 120%;
 }
 
+.thumb[data-is-ready='false']::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: var(--clr-bg);
+}
+
+.thumb[data-is-ready='false']::after {
+    content: '';
+    position: absolute;
+    width: var(--sp-5);
+    height: var(--sp-5);
+    border: 4px solid var(--clr-ink-secondary);
+    border-radius: 50%;
+    animation-name: loading-pulse;
+    animation-duration: 300ms;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    opacity: 0;
+}
+
+@keyframes loading-pulse {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.thumb[data-is-ready='true']::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: var(--clr-bg);
+    animation-name: loading-reveal;
+    animation-duration: 600ms;
+    animation-fill-mode: forwards;
+}
+
+@keyframes loading-reveal {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+
 /* BODY ----------------------------------- */
 .body {
     flex-grow: 1;
@@ -54,13 +113,13 @@ h3 {
     font-weight: 500;
 }
 
-span {
+.row span {
     font-family: var(--font-mono);
     font-size: 1.5rem;
     color: var(--clr-ink-secondary);
 }
 
-span:first-child {
+.row span:first-child {
     opacity: 0.75;
 }
 
