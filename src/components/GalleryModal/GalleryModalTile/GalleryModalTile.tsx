@@ -14,24 +14,25 @@ export type GalleryModalTileProps = {
 // FIXME Hardcode for the lulz.
 const tokenEtherscanUrl = 'https://etherscan.io/token/0xe61443f7db3ca8b7fc083602dcc52726db3d5ff6?a='
 const tokenOpenseaUrl = 'https://opensea.io/assets/ethereum/0xe61443f7db3ca8b7fc083602dcc52726db3d5ff6/'
-const ipfsGateway = 'https://ipfs.io/ipfs/bafybeiam3hfazboofhhid2azc2qi4oksapfhtbdz6mls7lonc5lf62yeaa/'
+const ipfsGateway = 'https://ipfs.io/ipfs/'
 
 export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
 
+    // FIXME Fuck cloudflare!!!!
     //const imageUrl  = useParallelAuctionState(s => s.getImageForId(id))
-    const imageUrl = `${ipfsGateway}${id}.png`
+    const imageUrl  = `${ipfsGateway}${process.env.REACT_APP_IMAGES_URI!}/${id}.png`
     const tokenName = useParallelAuctionState(s => s.getFormattedTokenNameFoId(id))
     const data      = useGalleryStore(s => s.getGalleryCardDataFor(id))
 
     const winner      = pipe(data, O.map(d => d.winner), O.getOrElse(() => 'Loading'))
     const hammerPrice = pipe(data, O.map(d => d.price), O.getOrElse(() => 'Loading'))
     const totalBids   = pipe(data, O.map(d => d.totalBids), O.getOrElse(() => 0))
-    const totalBiddedAmount = pipe(data, O.map(d => d.totalBiddedAmount), O.getOrElse(() => 'Loading'))
+    const totalVol    = pipe(data, O.map(d => d.totalBiddedAmount), O.getOrElse(() => 'Loading'))
 
     return (
         <div className={style['gallery-modal-tile-container']}>
             <div className={style['thumb']} data-is-ready={O.isSome(data)}>
-                <img src={O.isSome(data) ? imageUrl : '/404.png'} alt={tokenName}/>
+                <img src={imageUrl} alt={tokenName}/>
             </div>
 
             <div className={style['body']}>
@@ -53,7 +54,7 @@ export const GalleryModalTile: React.FC<GalleryModalTileProps> = ({ id }) => {
 
                 <div className={style['row']}>
                     <span>TOTAL BID VOLUME:</span>
-                    <span>{totalBiddedAmount}</span>
+                    <span>{totalVol}</span>
                 </div>
 
                 <div className={style['aux']}>

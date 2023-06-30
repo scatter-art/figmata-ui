@@ -13,10 +13,9 @@ export const GalleryModal: React.FC = () => {
 
     const swap = useGalleryStore(s => s.reverseGallery)
 
-    const [sortOrder, setSortOrder] = useState('DESCENDING')
+    const [sortOrder, setSortOrder] = useState('OLDEST')
     const handleSort = () => {
-        setSortOrder(sortOrder === 'DESCENDING' ? 'ASCENDING' : 'DESCENDING')
-
+        setSortOrder(sortOrder === 'OLDEST' ? 'LAST' : 'OLDEST')
         swap()
     }
 
@@ -56,7 +55,9 @@ export const GalleryModal: React.FC = () => {
             <div className={style['header']}>
                 <h2>Figmata Gallery</h2>
                 <div className={style['action-container']}>
-                    <button id={style['action-sort']} onClick={handleSort}><span>SORT: </span>{sortOrder}</button>
+                    <button id={style['action-sort']} onClick={handleSort}>
+                        <span>SORT: </span>{sortOrder}
+                    </button>
                     <button id={style['action-close']} onClick={closeModal}>x</button>
                 </div>
             </div>

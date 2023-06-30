@@ -6,6 +6,8 @@ import { AuctionHouseBody } from './AuctionHouseBody/AuctionHouseBody'
 import { Header } from './Header/Header'
 import { Toaster } from 'react-hot-toast'
 
+const cloudflareGateway = 'https://cloudflare-ipfs.com/ipfs/'
+
 export const FigmataPage: React.FC = () => {
 	const config = useParallelAuctionState(s => s.setAuctionData)
 	const auctionData = useParallelAuctionState(s => s.auctionData)
@@ -17,7 +19,7 @@ export const FigmataPage: React.FC = () => {
 		config(
 			process.env.REACT_APP_AUCTION_CONTRACT!,
 			'Figmata',
-			process.env.REACT_APP_IMAGES_URI!
+			`${cloudflareGateway}${process.env.REACT_APP_IMAGES_URI!}`
 		)
 	}, [userConnected, auctionData, config])
 
