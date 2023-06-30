@@ -30,6 +30,19 @@ export const vipIds = [
 // uglier.
 export const auctionsAtTheSameTime = 10
 
+// FIXME Those types shouln't be hardcoded.
+export type WonEvent = {
+    readonly id: bigint,
+    readonly winner: string,
+    readonly price: bigint 
+}
+
+export type BidEvent = {
+    readonly id: bigint,
+    readonly bidder: string,
+    readonly price: bigint 
+}
+
 type ParallelAuctionData = {
     readonly auctionAddress: string,
     readonly auctionContract: IParallelAutoAuction,
@@ -69,6 +82,12 @@ type ParallelAuctionStoreState = {
     getLine: (index: number) => O.Option<LineStateStruct>,
 
     /**
+     * @returns The line for `id`.
+     * None if its a wrong id.
+     */
+    getLineFromId: (id: number) => O.Option<LineStateStruct>,
+
+    /**
      * @returns The selected line based on `currentLineIndex`.
      */
     getCurrentSelectedLine: () => O.Option<LineStateStruct>,
@@ -94,11 +113,17 @@ type ParallelAuctionStoreState = {
     
     /* ------------- GENERAL CONTRACT QUERIES ------------- */
 
+    getImagesUri: () => O.Option<string>,
+
     getImage: (forLineIndex: number) => string,
+
+    getImageForId: (id: BigNumberish) => string,
 
     getCollectionName: () => O.Option<string>,
 
     getFormattedTokenName: (forLineIndex: number) => string,
+
+    getFormattedTokenNameFoId: (id: BigNumberish) => string,
 
     getAuctionConfig: () => O.Option<AuctionConfigStruct>,
     
@@ -107,6 +132,8 @@ type ParallelAuctionStoreState = {
     getFormattedCurrentBid: (forLineIndex: number) => string,
 
     getFormattedCurrentWinner: (forLineIndex: number) => string,
+
+    getCurrentlyAuctionedIds: () => Promise<O.Option<number[]>>,
 
     createBid: (value: number) => Promise<O.Option<ethers.ContractTransactionResponse>>,
 
@@ -125,6 +152,9 @@ type ParallelAuctionStoreState = {
      */
     getLineIsVip: (line: O.Option<LineStateStruct>) => boolean,
 
+    getContractWonEventFor: (id: BigNumberish) => Promise<O.Option<WonEvent>>
+
+    getContractBidEventFor: (id: BigNumberish) => Promise<O.Option<BidEvent[]>>
     
     /* --------------- CALLBACK FUNCTIONS --------------- */
     /**
@@ -147,10 +177,13 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
     currentLineIndex: 0,
     lines: O.none,
 
-    getLine: (index: number) => pipe(
+    getLine: index => pipe(
         get().lines,
-        O.flatMap(lines => lines[index])
+        O.flatMap(lines => O.fromNullable(lines[index])),
+        O.flatten
     ),
+
+    getLineFromId: id => get().getLine((id - 1) % 10),
 
     getCurrentSelectedLine: () => get().getLine(get().currentLineIndex),
 
@@ -296,11 +329,22 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         return newLine
     },
     
-    getImage: (forLineIndex: number) => pipe(
-        O.Do,
-        O.bind('line', () => get().getLine(forLineIndex)),
-        O.bind('uri', () => pipe(get().auctionData, O.map(d => d.tokenImagesUri))),
-        O.map(({ line, uri }) => `${uri}/${line.head}.png`),
+
+    getImagesUri: () => pipe(
+        get().auctionData,
+        O.map(d => d.tokenImagesUri)
+    ),
+
+    getImage: lineIndex => pipe(
+        get().getLine(lineIndex),
+        O.map(l => l.head),
+        O.map(get().getImageForId),
+        O.getOrElse(() => '/404.png')
+    ),
+
+    getImageForId: id => pipe(
+        get().getImagesUri(),
+        O.map(uri => `${uri}/${id}.png`),
         O.getOrElse(() => '/404.png')
     ),
     
@@ -309,11 +353,16 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.map(data => data.tokenName)
     ),
 
-    getFormattedTokenName: (forLineIndex: number) => pipe(
-        O.Do,
-        O.bind('name', get().getCollectionName),
-        O.bind('line', () => get().getLine(forLineIndex)),
-        O.map(({ name, line }) => `${name} #${line.head}`),
+    getFormattedTokenName: lineIndex => pipe(
+        get().getLine(lineIndex),
+        O.map(l => l.head),
+        O.map(get().getFormattedTokenNameFoId),
+        O.getOrElse(PROVIDER_DOWN_MESSAGE)
+    ),
+
+    getFormattedTokenNameFoId: id => pipe(
+        get().getCollectionName(),
+        O.map(name => `${name} #${id}`),
         O.getOrElse(PROVIDER_DOWN_MESSAGE)
     ),
 
@@ -338,6 +387,14 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.flatMap(line => formatAddr(line.currentWinner.toString(), 11)),
         O.getOrElse(PROVIDER_DOWN_MESSAGE)
     ),
+
+    getCurrentlyAuctionedIds: async () => await pipe(
+        get().auctionData,
+        O.map(d => d.auctionContract),
+        TO.fromOption,
+        TO2.flatTry(x => x.getIdsToAuction()),
+        TO.map(A.map(Number))
+    )(),
     
     // TODO This solution is ugly af, can't I use the user wallet for
     // signing and querying at the same time?
@@ -381,6 +438,46 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
         O.map(l => l.head),
         O.exists(i => vipIds.includes(Number(i)))
     ),
+
+    getContractWonEventFor: async (id) => {
+        const auctionDataOpt = get().auctionData
+        if (O.isNone(auctionDataOpt)) return O.none
+        const auctionData = auctionDataOpt.value
+
+        const winsFilter = auctionData.auctionContract.filters.Won(id)
+        
+        const rawEvents = await auctionData.auctionContract.queryFilter(winsFilter)
+
+        return pipe(
+            rawEvents[0],
+            e => O.fromNullable(({
+                id: e.args[0], winner: e.args[1], price: e.args[2]
+            }))
+        )
+    },
+
+    getContractBidEventFor: async (id) => {
+
+        const auctionDataOpt = get().auctionData
+        if (O.isNone(auctionDataOpt)) return O.none
+        const auctionData = auctionDataOpt.value
+
+        const bidsFilter = auctionData.auctionContract.filters.Bid(id)
+        const rawEvents = await auctionData.auctionContract.queryFilter(bidsFilter)
+
+        const eventsOpts = pipe(
+            rawEvents,
+            A.map(e => O.fromNullable(({
+                id: e.args[0], bidder: e.args[1], price: e.args[2]
+            }))),
+        )
+        
+        return A.every(O.isSome)(eventsOpts)
+            ? O.some(eventsOpts.map(e => e.value))
+            : O.none
+
+    },
+
 
     /* --------------- CALLBACK FUNCTIONS --------------- */
     _onBidEventDo: (biddedId: bigint, bidder: string, value: BigNumberish) => pipe(
