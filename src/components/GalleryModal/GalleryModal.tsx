@@ -15,7 +15,7 @@ export const GalleryModal: React.FC = () => {
 
     const [sortOrder, setSortOrder] = useState('OLDEST')
     const handleSort = () => {
-        setSortOrder(sortOrder === 'OLDEST' ? 'LAST' : 'OLDEST')
+        setSortOrder(sortOrder === 'OLDEST' ? 'NEWEST' : 'OLDEST')
         swap()
     }
 

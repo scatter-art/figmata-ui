@@ -254,7 +254,7 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
             O.flatMap(({ shouldUpdate, possibleWonIdsToUpdate }) => pipe(
                 Math.min(...possibleWonIdsToUpdate) - 1,
                 O.fromPredicate(() => shouldUpdate),
-                O.map(min => min > 0 ? RNEA.range(1, min) : []),
+                O.map(min => min >= auctionsAtTheSameTime ? RNEA.range(1, min) : []),
                 O.map(RA.concat(possibleWonIdsToUpdate)),
                 O.map(RA.sort(N.Ord)),
             )),
