@@ -11,9 +11,14 @@ export const GalleryModal: React.FC = () => {
     const loadIds = useGalleryStore(s => s.getAllWonIds)
     const ids = useGalleryStore(s => s.wonIds)
 
-    // NOTE This function could be used to change the ids order from
-    // ascending to descending.
-    //const swap = useGalleryStore(s => s.reverseGallery)
+    const swap = useGalleryStore(s => s.reverseGallery)
+
+    const [sortOrder, setSortOrder] = useState('DESCENDING')
+    const handleSort = () => {
+        setSortOrder(sortOrder === 'DESCENDING' ? 'ASCENDING' : 'DESCENDING')
+
+        swap()
+    }
 
     const [isVisible, setIsVisible] = useState(false);
     const openModal = () => {
@@ -50,7 +55,10 @@ export const GalleryModal: React.FC = () => {
         <div id={style['gallery-modal-container']} data-is-visible={isVisible}>
             <div className={style['header']}>
                 <h2>Figmata Gallery</h2>
-                <button id={style['action-close']} onClick={closeModal}>x</button>
+                <div className={style['action-container']}>
+                    <button id={style['action-sort']} onClick={handleSort}><span>SORT: </span>{sortOrder}</button>
+                    <button id={style['action-close']} onClick={closeModal}>x</button>
+                </div>
             </div>
 
             <div className={style['body']}>
