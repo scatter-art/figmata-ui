@@ -7,7 +7,7 @@ import { hideSidePanelObserver, showSidePanelObserver } from '../../../state/obs
 import { fromWei } from '../../../utils/web3'
 import { sleep } from '../../../utils/pure'
 import Countdown from 'react-countdown'
-import { VipBadgeSvg } from './VipBadgeSvg'
+import { VipBadgeSvg } from '../../Svgs/VipBadgeSvg'
 import { useUserStatusStore } from '../../../state/userStatusStore'
 
 interface AuctionCardProps {

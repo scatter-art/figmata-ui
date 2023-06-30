@@ -1,0 +1,184 @@
+/* HOST ----------------------------------- */
+#gallery-button-container {
+	padding: var(--sp-5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: var(--sp-12);
+	background-color: var(--clr-accent-tertiary);
+	transform: translateY(-18%);
+}
+
+#gallery-button {
+	padding: var(--sp-1) var(--sp-5);
+	border-style: none;
+	border-radius: var(--sp-5);
+	background-color: var(--clr-accent-tertiary);
+	font-family: var(--font-pixel);
+	font-size: 1rem;
+	color: var(--clr-accent-tertiary-heavy);
+	box-shadow: var(--ev-neu-1-accent-tertiary);
+	cursor: pointer;
+    transition: 300ms;
+}
+
+#gallery-button:hover {
+    transform: scale(1.125);
+}
+
+/* MODAL ---------------------------------- */
+#gallery-modal-container {
+    position: fixed;
+    top: var(--sp-2);
+    right: var(--sp-2);
+    bottom: var(--sp-2);
+    left: var(--sp-2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--sp-2);
+    background-color: var(--clr-bg);
+    box-shadow: var(--ev-neu-outer), 0px 12px 120px rgba(0,0,0,0.5);
+    z-index: 10;
+    transition: 600ms;
+}
+
+#gallery-modal-container[data-is-visible='false'] {
+    opacity: 0;
+    transform: translateY(100%);
+    transition-timing-function: cubic-bezier(0.68,-0.55,0.27,1.55);
+}
+
+
+#gallery-modal-container[data-is-visible='true'] {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* #gallery-modal-container[data-is-visible='true'] {
+    opacity: 1;
+} */
+
+/* HEADER --------------------------------- */
+.header {
+    /* width: 100%; */
+    height: var(--sp-9);
+    min-height: var(--sp-9);
+    padding: var(--gap-i) var(--gap-o);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h2 {
+    color: var(--clr-ink-secondary);
+    font-weight: 500;
+}
+
+/* ACTIONS -------------------------------- */
+.action-container {
+    height: 100%;
+    display: flex;
+    gap: var(--gap-o);
+    align-items: center;
+}
+
+.header button {
+    height: 100%;
+    border-radius: var(--sp-12);
+    border-style: none;
+    font-family: var(--font-pixel);
+    color: var(--clr-ink-secondary);
+    background-color: var(--clr-bg);
+    box-shadow: var(--ev-neu-1-bg);
+    cursor: pointer;
+    transition: 300ms;
+}
+
+#action-close {
+    width: var(--sp-12);   
+    font-family: var(--font-pixel);
+    font-size: 1.5rem;
+}
+
+#action-close:hover {
+    color: var(--clr-accent);
+    transform: scale(1.125);
+}
+
+#action-sort {
+    padding: 0 var(--gap-i);
+    border: 1px solid transparent;
+}
+
+#action-sort:hover {
+    border: 1px solid var(--clr-accent);
+}
+
+#action-sort span {
+    opacity: 0.75;
+}
+
+/* BODY ----------------------------------- */
+.body {
+    padding: var(--gap-i);
+    overflow-y: scroll;
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-content: start;
+    align-items: start;
+    gap: var(--gap-i);
+    border-radius: var(--sp-2);
+    background-color: var(--clr-surface);
+}
+
+@media screen and (min-width: 1921px) {
+    .body {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media screen and (max-width: 1080px) {
+    .body {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* LOAD MORE BUTTON ----------------------- */
+#load-more-button {
+    width: auto;
+    margin: 10px auto;
+    padding: 10px 20px;
+	height: var(--sp-4);
+	border-style: none;
+	border: 1px solid transparent;
+	border-radius: var(--sp-1);
+	background-color: var(--clr-surface);
+	font-family: var(--font-pixel);
+	font-size: 0.675rem;
+    color: var(--clr-ink-secondary);
+	box-shadow: var(--ev-neu-inner-action);
+	cursor: pointer;
+    justify-self: center;
+    align-self: center;
+    grid-column: 1 / span 2;
+}
+
+@media screen and (min-width: 1921px) {
+    #load-more-button {
+        grid-column: 1 / span 3;
+    }
+}
+
+@media screen and (max-width: 1080px) {
+    #load-more-button {
+        grid-column: 1 / span 1;
+    }
+}
+
+#load-more-button:hover {
+	border: 1px solid var(--clr-accent);
+	transition: 250ms;
+}
