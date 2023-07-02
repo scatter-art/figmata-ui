@@ -2,9 +2,7 @@ import * as O from 'fp-ts/Option'
 import * as E from 'fp-ts/Either'
 import * as TO from 'fp-ts/TaskOption'
 import * as A from 'fp-ts/Array'
-import * as RNEA from 'fp-ts/ReadonlyNonEmptyArray'
 import * as RA from 'fp-ts/ReadonlyArray'
-import * as N from 'fp-ts/number'
 import * as Ord from 'fp-ts/Ord'
 import { create } from 'zustand'
 import { 
@@ -100,6 +98,12 @@ type GalleryStoreState = {
      *          `O.some(newUpdatedIds)` otherwise.
      */
     _updateWonIds: () => Promise<O.Option<readonly number[]>>,
+
+    /**
+     * @dev Let `m` be `acutionsAtTheSameTime`.
+     * Then it will return `[n, n - m, n - 2m, ...]` until 0.
+     */
+    _idsRange: (n: number) => number[],
 
 }
 
@@ -207,62 +211,34 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
         return galleryData
     },
     
-    
-    // TODO FIXME All those computations are intensive af, maybe I
-    // could add them into a mutex or something? Another way of
-    // optimizing it is making it immutable and only updateable by a
-    // certain method (from, for example, bid event handling).
     _updateWonIds: async () => {
-
-        const currentWonIds = pipe(
-            get().wonIds,
-            O.getOrElse(() => [] as readonly number[])
-        )
-
         const currentlyAuctionedIds = await useParallelAuctionState
             .getState()
             .getCurrentlyAuctionedIds() 
         
-        /**
-         * @dev Let `ids` be `currentlyAuctionedIds.value`.
-         * Let's say `ids == {7,5,9}`. That can only mean that
-         * `ids.map(id => id - 3)` are already won ids. Let these ids
-         * be `ids'`. That means that all the won ids are 
-         *              
-         *         {1, 2, ..., min(ids') - 1} U ids'
-         *
-         * Let this set be `ids''`.
-         *
-         * So, in the following procedure, we first compute `ids'` in
-         * `possibleWonIdsToUpdate`. Then we check if we even need to
-         * update `ids''` in `shouldUpdate`. Finally we compute
-         * `ids''` as explained and update the store state.
-         */
+        if (O.isNone(currentlyAuctionedIds)) return O.none
+
+
         const newIds = pipe(
-            O.Do,
-            O.bind('auctionedIds', () => currentlyAuctionedIds),
-            O.bind('wonIds', () => O.of(currentWonIds)),
-            O.bind('possibleWonIdsToUpdate', ({ auctionedIds }) => O.of(pipe(
-                auctionedIds,
-                A.map(id => id - auctionsAtTheSameTime),
-                A.filter(id => id > 0),
-            ))),
-            O.bind('shouldUpdate', ({ possibleWonIdsToUpdate, wonIds }) => O.of(pipe(
-                possibleWonIdsToUpdate,
-                A.exists(id => !wonIds.includes(id))
-            ))),
-            O.flatMap(({ shouldUpdate, possibleWonIdsToUpdate }) => pipe(
-                Math.min(...possibleWonIdsToUpdate) - 1,
-                O.fromPredicate(() => shouldUpdate),
-                O.map(min => min >= auctionsAtTheSameTime ? RNEA.range(1, min) : []),
-                O.map(RA.concat(possibleWonIdsToUpdate)),
-                O.map(RA.sort(N.Ord)),
-            )),
+            currentlyAuctionedIds.value,
+            A.map(x => x - auctionsAtTheSameTime),
+            A.flatMap(get()._idsRange),
+            A.sort(Ord.ordNumber)
         )
         
-        if (O.isSome(newIds)) set({ wonIds: newIds })
-        
-        return newIds
+        console.log(newIds)
+        set({ wonIds: O.some(newIds) })
+
+        return O.some(newIds)
+    },
+
+    _idsRange: (n: number): number[] => {
+        var mods = []
+        for (let i = 0;; i++) {
+            const mod = n - i * auctionsAtTheSameTime
+            if (mod < 1) return mods
+            mods.push(mod)
+        }
     }
 
 }})
