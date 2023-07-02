@@ -43,7 +43,7 @@ const getCurrentWinnerOrdering: Ord.Ord<BidEvent> = pipe(
     Ord.contramap(x => ethers.getBigInt(x.price))
 )
 
-const testMutex = new Mutex()
+const queryCardDataMutex = new Mutex()
 
 
 type GalleryStoreState = {
@@ -141,7 +141,7 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
 
     // TODO This could get further optimized if you had a mutex for
     // each galler card, so they run independently.
-    _updateGalleryCardData: async (id) => await testMutex.runExclusive(() => 
+    _updateGalleryCardData: async (id) => await queryCardDataMutex.runExclusive(() => 
         get()._unsafeUpdateGalleryCardData(id)
     ),
 
@@ -226,7 +226,6 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
             A.sort(Ord.ordNumber)
         )
         
-        console.log(newIds)
         set({ wonIds: O.some(newIds) })
 
         return O.some(newIds)

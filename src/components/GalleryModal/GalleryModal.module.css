@@ -7,8 +7,6 @@
 	border-radius: var(--sp-12);
 	background-color: var(--clr-accent-tertiary);
 	transform: translateY(-18%);
-    padding-left: 12px;
-    padding-right: 12px;
 }
 
 #gallery-button {
@@ -22,8 +20,18 @@
 	box-shadow: var(--ev-neu-1-accent-tertiary);
 	cursor: pointer;
     transition: 300ms;
-    padding-left: 6px;
-    padding-right: 6px;
+}
+
+@media screen and (max-width: 520px) {
+	#gallery-button-container {
+		padding-left: 12px;
+		padding-right: 12px;
+	}
+
+	#gallery-button {
+		padding-left: 6px;
+		padding-right: 6px;
+	}
 }
 
 #gallery-button:hover {
