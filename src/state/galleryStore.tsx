@@ -147,6 +147,7 @@ export const useGalleryStore = create<GalleryStoreState>((set, get) => {return {
 
     _unsafeUpdateGalleryCardData: async (id) => {
         // If the data is already available, return it.
+
         const storedData = get().galleryCards.get(id)
         if (storedData) return O.some(storedData)
 
