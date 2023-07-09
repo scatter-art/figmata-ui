@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { PROVIDER_DOWN_MESSAGE, useParallelAuctionState, vipIds } from '../../state/autoAuctionStore'
+import { maxSupply, PROVIDER_DOWN_MESSAGE, useParallelAuctionState, vipIds } from '../../state/autoAuctionStore'
 import { DappConnector } from './DappConnector/DappConnector'
 import * as O from 'fp-ts/Option'
 import style from './SidePanel.module.css'
@@ -13,6 +13,7 @@ import { pipe } from 'fp-ts/lib/function'
 export const SidePanel: React.FC = () => {
 	const line = useParallelAuctionState((state) => state.getCurrentSelectedLine)()
 	const lineIndex = useParallelAuctionState((s) => s.currentLineIndex)
+    const lineFinished = O.isSome(line) && line.value.head > maxSupply
 	reRenderSidePanelObserver((s) => s.observer) // Subscription
 
     const isVip = pipe(
@@ -60,7 +61,10 @@ export const SidePanel: React.FC = () => {
 			<DappConnector />
 
 			<div id={style['focus-token-details']}>
-				<div id={style['focus-token-title']}>
+				<div 
+                    id={style['focus-token-title']}
+                    style={{ display: lineFinished ? 'none' : 'flex' }}
+                >
 					<span>{tokenName}</span>
 				</div>
 
@@ -75,10 +79,13 @@ export const SidePanel: React.FC = () => {
 
 					</div>
 
-					<img id={style['focus-token-image']} src={imageUrl} alt='Pixelady Figmata NFT artwork' />
+					<img id={style['focus-token-image']} src={lineFinished ? '/soldOut.png' : imageUrl} alt='Pixelady Figmata NFT artwork' />
 				</div>
 
-				<div id={style['focus-token-auction-details-container']}>
+				<div 
+                    id={style['focus-token-auction-details-container']}
+                    style={{ display: lineFinished ? 'none' : 'flex' }}
+                >
 					<div className={style['focus-token-auction-details-item']}>
 						<span>Current bid:</span>
 						<span>{currentBid}</span>
@@ -101,7 +108,7 @@ export const SidePanel: React.FC = () => {
 				</div>
 			</div>
 
-			<PlaceBidButton />
+			<PlaceBidButton enabled={!lineFinished}/>
 		</div>
 	)
 }

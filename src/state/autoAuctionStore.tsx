@@ -27,6 +27,7 @@ export const vipIds = process.env.REACT_APP_VIP_IDS!.split(',').map(Number)
 // having lots of silly consts like `tokenName` only make the store
 // uglier.
 export const auctionsAtTheSameTime = 10
+export const maxSupply = 180
 
 // FIXME Those types shouln't be hardcoded.
 export type WonEvent = {

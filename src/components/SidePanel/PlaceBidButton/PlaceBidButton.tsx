@@ -27,8 +27,12 @@ const calcMinPriceForLine = (line: O.Option<LineStateStruct>, config: O.Option<A
 	return pipe(newPrice, O.map(fromWei), O.getOrElse(PROVIDER_DOWN_MESSAGE))
 }
 
+type PlaceBidButtonProps = {
+    enabled?: boolean
+}
+
 // TODO ??? Fix this, the state is all over the place.
-export const PlaceBidButton = () => {
+export const PlaceBidButton: React.FC<PlaceBidButtonProps> = ({ enabled = true }) => {
 	const line = useParallelAuctionState(s => s.getCurrentSelectedLine)()
 	const lineIndex = useParallelAuctionState(s => s.currentLineIndex)
 	const reRenderSidePanel = reRenderSidePanelObserver(s => s.notifyObservers)
@@ -134,9 +138,9 @@ export const PlaceBidButton = () => {
 
 	return (
 		<>
-			<div id={style['place-bid-button-container']} onClick={handleModalOppening}>
+			<div id={style['place-bid-button-container']} onClick={enabled ? handleModalOppening : constVoid}>
 				<div id={style['place-bid-button']}>
-					<span>PLACE YOUR BID</span>
+					<span>{enabled ? 'PLACE YOUR BID' : 'AUCTION ENDED'}</span>
 				</div>
 			</div>
 			<dialog id="bidModal">

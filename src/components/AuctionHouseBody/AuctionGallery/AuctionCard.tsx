@@ -2,7 +2,7 @@ import React from 'react'
 import style from './AuctionCard.module.css'
 import * as O from 'fp-ts/Option'
 import { pipe } from 'fp-ts/lib/function'
-import { useParallelAuctionState } from '../../../state/autoAuctionStore'
+import { maxSupply, useParallelAuctionState } from '../../../state/autoAuctionStore'
 import { hideSidePanelObserver, showSidePanelObserver } from '../../../state/observerStore'
 import { fromWei } from '../../../utils/web3'
 import { sleep } from '../../../utils/pure'
@@ -21,6 +21,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
     const line                   = useParallelAuctionState(s => s.getLine(lineIndex))
     const imageUrl               = useParallelAuctionState(s => s.getImage(lineIndex))
     const isVip                  = useParallelAuctionState(s => s.getLineIsVip(line))
+    const lineFinished           = O.isSome(line) && line.value.head > maxSupply
 
 
     /* ---------------- WINNING BADGE HANDLING ---------------- */
@@ -56,6 +57,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
     )
 
     const onCardClick = async () => {
+        if (lineFinished) return
         hideSidePanel()
         // NOTE This sleep should be based on how long the side panel
         // hidding animation takes.
@@ -89,18 +91,24 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ lineIndex }) => {
 
                 <div
                     className={style['thumbnail']}
-                    style={{ backgroundImage: `url(${imageUrl})` }}
+                    style={{ backgroundImage: `url(${lineFinished ? '/soldOut.png' : imageUrl})` }}
                 >
                 </div>
             </div>
-            <div className={style['details']}>
+            <div 
+                className={style['details']}
+                style={{ display: lineFinished ? 'none' : 'flex' }}
+            >
                 <span>{formattedCurrentBid}</span>
                 <span> {O.isSome(endTime) ?
                     <Countdown date={endTime.value*1000} daysInHours/> : ''
                 } </span>
             </div>
             <button className={style['action']}>
-                {O.isSome(endTime) ? 'PLACE BID' : '404 :('}
+                { lineFinished
+                    ? 'SOLD OUT' : O.isSome(endTime) 
+                        ? 'PLACE BID' : '404 :('
+                }
             </button>
         </div>
     )
