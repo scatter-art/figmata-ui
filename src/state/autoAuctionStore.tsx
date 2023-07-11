@@ -262,7 +262,7 @@ export const useParallelAuctionState = create<ParallelAuctionStoreState>((set, g
             TO.bind('lines', ({ auction }) => TO.tryCatch(() => auction.lineStates())),
             TO.map(({ lines, maxSupply }) => pipe(
                 lines,
-                A.map(O.fromPredicate(line => maxSupply >= line.head))
+                A.map(O.fromPredicate(line => (maxSupply + BigInt(11)) >= line.head)) // UGLY HOTFIX FIXME
             )),
         )()
         
